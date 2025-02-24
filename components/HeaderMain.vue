@@ -40,13 +40,6 @@
 	background-color: $HeaderBgMain;
 	color: $ConteudoTheme;
 }
-
-.buttonClassico:hover {
-	color: var(--hover-text) !important;
-	transform: translate(-0.25rem, -0.25rem) !important;
-	background: var(--hover-bg) !important;
-	box-shadow: 0.25rem 0.25rem var(--bg), 0 0 10px rgba(0, 0, 0, 0.2) !important;
-}
 </style>
 
 <!-- <script lang="ts" setup>
