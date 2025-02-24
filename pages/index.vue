@@ -62,7 +62,6 @@ definePageMeta({
 });
 let Arraypalavras = ['quer', 'necessita', 'ama', 'adora'];
 let num = 0;
-
 onMounted(() => {
 	const mudaPalavra = (num) => {
 		const palavra = Arraypalavras[num];
