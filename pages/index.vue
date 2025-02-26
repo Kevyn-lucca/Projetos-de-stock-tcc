@@ -60,6 +60,7 @@
 definePageMeta({
 	layout: 'prelogin',
 });
+//loppa pelo array de palavras e
 let Arraypalavras = ['quer', 'necessita', 'ama', 'adora'];
 let num = 0;
 onMounted(() => {
