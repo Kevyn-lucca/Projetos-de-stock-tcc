@@ -28,6 +28,9 @@
         <NuxtLink to="/login">
           <button class="buttonClassico">Login</button>
         </NuxtLink>
+        <NuxtLink to="/gerenciamentofilial">
+          <button class="buttonClassico">FILIIASISSSS</button>
+        </NuxtLink>
       </div>
     </div>
   </nav>
