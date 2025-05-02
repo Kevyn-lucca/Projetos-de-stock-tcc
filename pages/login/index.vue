@@ -8,12 +8,12 @@
       <div class="text-4xl font-medium mb-12 text-primary-contrast">
         Bem vindo
       </div>
-      <InputText
+      <input
         type="text"
         class="!appearance-none placeholder:!text-primary-contrast/40 !border-0 !p-4 !w-full !outline-0 !text-xl !block !mb-6 !bg-white/10 !text-primary-contrast/70 !rounded-full"
         placeholder="E-mail"
       />
-      <InputText
+      <input
         type="text"
         class="!appearance-none placeholder:!text-primary-contrast/40 !border-0 !p-4 !w-full !outline-0 !text-xl !mb-6 !bg-white/10 !text-primary-contrast/70 !rounded-full"
         placeholder="Senha"
@@ -33,7 +33,8 @@
 </template>
 
 <script setup>
-import InputText from "primevue/inputtext";
-
+definePageMeta({
+  layout: false,
+});
 //TODO: tenho que fazer com que o usuario não seja capaz de logar caso usando a url e invadir o site
 </script>

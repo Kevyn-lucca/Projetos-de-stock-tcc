@@ -58,9 +58,13 @@
   </div>
 </template>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
 .buttonClassico:hover {
   box-shadow: 0.25rem 0.25rem black, 0 0 10px rgba(0, 0, 0, 0.2) !important;
+}
+
+body {
+  background-color: $HeaderBgMain;
 }
 </style>
 

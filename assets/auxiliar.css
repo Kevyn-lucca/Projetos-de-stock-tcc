@@ -1,20 +1,23 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
 .buttonClassico {
-  background: $MioloPao;
+  background: #f4e1c1;
   color: #4e2a1d;
   cursor: pointer;
-  border: 1px solid $MioloPao;
+  border: 1px solid;
   border-radius: 8px;
   padding: 0.6em 1.5em;
   transition: 0.3s ease;
   font-weight: bold;
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 0 5px #f4e1c1 rgba(0, 0, 0, 0.1);
 }
 
 .buttonClassico:hover {
-  color: $MioloPao;
+  color: #f4e1c1;
   transform: translate(-0.25rem, -0.25rem);
-  background: $cascaPao;
-  box-shadow: 0.25rem 0.25rem $MioloPao, 0 0 10px rgba(0, 0, 0, 0.2);
+  background: #d98b4d;
+  box-shadow: 0.25rem 0.25rem #f4e1c1, 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
 .buttonClassico:active {
