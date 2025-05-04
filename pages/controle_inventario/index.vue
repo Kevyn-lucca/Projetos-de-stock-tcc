@@ -10,7 +10,7 @@
           class="w-full h-14 px-4 text-black text-2xl placeholder-gray-400 focus:outline-none focus:ring-2 rounded-2xl"
         />
       </div>
-      <UButton @click="MudarEstilo()" size="md" variant="ghost">
+      <UButton size="md" variant="ghost" @click="MudarEstilo()">
         {{ estiloNovo }}</UButton
       >
     </div>
@@ -30,28 +30,15 @@
   </div>
 </template>
 
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease-in-out;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>
-
 <script setup lang="ts">
-let showColumn = ref(false);
-let estiloNovo = ref("Blocos");
+import { h, resolveComponent } from "vue";
+import type { TableColumn } from "@nuxt/ui";
+const showColumn = ref(false);
+const estiloNovo = ref("Blocos");
 function MudarEstilo() {
   showColumn.value = !showColumn.value;
   estiloNovo.value = estiloNovo.value === "Tabela" ? "Blocos" : "Tabela";
 }
-
-import { h, resolveComponent } from "vue";
-import type { TableColumn } from "@nuxt/ui";
 
 const UBadge = resolveComponent("UBadge");
 
@@ -171,3 +158,15 @@ const columns: TableColumn<Produtos>[] = [
   },
 ];
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease-in-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

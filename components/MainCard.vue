@@ -1,6 +1,6 @@
 <template>
   <div class="h-64 w-64">
-    <div class="h-42 w-72 bg-amber-100 rounded-t-2xl"></div>
+    <div class="h-42 w-72 bg-amber-100 rounded-t-2xl" />
     <div class="h-22 w-72 bg-orange-400">
       <UModal title="Nome do produto">
         <UButton label="Editar" color="neutral" variant="subtle" />

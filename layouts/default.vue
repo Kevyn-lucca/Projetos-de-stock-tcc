@@ -6,7 +6,7 @@
     </nav>
     <div class="flex-1">
       <main>
-        <slot></slot>
+        <slot />
       </main>
     </div>
   </div>
