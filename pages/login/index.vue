@@ -1,6 +1,7 @@
+<!-- eslint-disable no-undef -->
 <template>
   <div
-    class="h-screen px-6 py-20 md:px-12 lg:px-20 flex items-center justify-center bg-[linear-gradient(-225deg,var(--p-primary-500),var(--p-primary-700)_48%,var(--p-primary-800))] dark:bg-[linear-gradient(-225deg,var(--p-primary-400),var(--p-primary-600)_48%,var(--p-primary-800))]"
+    class="h-screen px-6 py-20 md:px-12 lg:px-20 flex items-center justify-center bg-[linear-gradient(-225deg,#10b981,#047857_48%,#065f46)]"
   >
     <div
       class="p-12 shadow text-center lg:w-[30rem] backdrop-blur-md rounded-xl bg-[rgba(255,255,255,0.1)]"
@@ -10,12 +11,12 @@
       </div>
       <input
         type="text"
-        class="!appearance-none placeholder:!text-primary-contrast/40 !border-0 !p-4 !w-full !outline-0 !text-xl !block !mb-6 !bg-white/10 !text-primary-contrast/70 !rounded-full"
+        class="!appearance-none placeholder:!text-primary-contrast/40 !border-0 !p-4 !w-full !outline-0 !text-xl !block !mb-6 !bg-white/10 active:bg-white/20 !text-primary-contrast/70 !rounded-full"
         placeholder="E-mail"
       />
       <input
         type="text"
-        class="!appearance-none placeholder:!text-primary-contrast/40 !border-0 !p-4 !w-full !outline-0 !text-xl !mb-6 !bg-white/10 !text-primary-contrast/70 !rounded-full"
+        class="!appearance-none placeholder:!text-primary-contrast/40 !border-0 !p-4 !w-full !outline-0 !text-xl !mb-6 !bg-white/10 active:bg-white/20 !text-primary-contrast/70 !rounded-full"
         placeholder="Senha"
       />
       <button
@@ -33,6 +34,7 @@
 </template>
 
 <script setup>
+// eslint-disable-next-line no-undef
 definePageMeta({
   layout: false,
 });

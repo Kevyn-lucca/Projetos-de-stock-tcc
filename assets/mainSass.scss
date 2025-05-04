@@ -32,3 +32,8 @@ $cascaPao: #d98b4d;
   --p-surface-950: #09090b;
   --p-content-border-radius: 6px;
 }
+
+body {
+  overflow-y: hidden; /* Hide vertical scrollbar */
+  overflow-x: hidden; /* Hide horizontal scrollbar */
+}

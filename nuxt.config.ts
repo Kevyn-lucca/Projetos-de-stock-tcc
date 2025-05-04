@@ -12,5 +12,5 @@ export default defineNuxtConfig({
       },
     },
   },
-  modules: ["@formkit/auto-animate/nuxt", "@nuxt/ui"],
+  modules: ["@formkit/auto-animate/nuxt", "@nuxt/ui", "@nuxt/eslint"],
 });
