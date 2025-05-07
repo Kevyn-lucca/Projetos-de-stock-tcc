@@ -13,7 +13,7 @@
             <h1
               class="text-4xl xl:text-5xl font-bold text-surface-0 lg:text-surface-900 dark:text-surface-0 mb-6 !leading-tight"
             >
-              O sistema que teste negocio
+              O sistema que seu negocio
               <span aria-label="precisa" class="typewriter"></span>
             </h1>
             <p
