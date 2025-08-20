@@ -13,11 +13,7 @@ const groups = [
         icon: "i-lucide-credit-card",
       },
       {
-        label: "Notificações",
-        icon: "i-lucide-bell",
-      },
-      {
-        label: "Security",
+        label: "Segurança",
         icon: "i-lucide-lock",
       },
     ],
@@ -27,10 +23,6 @@ const groups = [
     label: "Ambiente",
     items: [
       {
-        label: "Perfil",
-        icon: "i-lucide-user",
-      },
-      {
         label: "Formas de pagamento",
         icon: "i-lucide-credit-card",
       },
@@ -39,7 +31,7 @@ const groups = [
         icon: "i-lucide-bell",
       },
       {
-        label: "Modo escuro",
+        label: "Modo claro",
         icon: "ic:outline-lightbulb",
       },
     ],

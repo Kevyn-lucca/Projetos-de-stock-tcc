@@ -1,9 +1,24 @@
+<script setup lang="ts">
+const props = defineProps<{ img: string }>();
+</script>
+
 <template>
   <div class="h-64 w-64">
-    <div class="h-42 w-72 bg-amber-100 rounded-t-2xl" />
-    <div class="h-22 w-72 bg-orange-400">
+    <div v-if="!props.img" class="h-42 w-64 bg-amber-100 rounded-t-2xl" />
+    <NuxtImg
+      v-else
+      class="h-42 w-72 rounded-t-2xl"
+      :src="props.img"
+      alt="Minha imagem"
+    />
+    <div class="h-22 w-64 bg-orange-400">
       <UModal title="Nome do produto">
-        <UButton label="Editar" color="neutral" variant="subtle" />
+        <UButton
+          class="ml-25 mt-12"
+          label="Editar"
+          color="neutral"
+          variant="subtle"
+        />
         <template #body>
           <div class="flex justify-around w-full border-b border-gray-300">
             <div class="px-4 py-2 font-medium dark:text-white text-gray-700">
