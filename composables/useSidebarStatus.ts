@@ -1,3 +1,3 @@
 export const useSidebarStatus = () => {
-  return useState<boolean>("sidebarStatus", () => false);
+  return useState<boolean>("sidebarStatus", () => true);
 };

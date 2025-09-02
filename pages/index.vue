@@ -14,7 +14,7 @@
               class="text-4xl xl:text-5xl font-bold text-surface-0 lg:text-surface-900 dark:text-surface-0 mb-6 !leading-tight"
             >
               O sistema que seu negocio
-              <span aria-label="precisa" class="typewriter"></span>
+              <span aria-label="precisa" class="typewriter" />
             </h1>
             <p
               class="text-surface-0/90 lg:text-surface-700 dark:text-surface-200 text-xl leading-normal mb-8 max-w-xl lg:max-w-none"
@@ -58,6 +58,12 @@
   </div>
 </template>
 
+<script setup>
+definePageMeta({
+  layout: "prelogin",
+});
+</script>
+
 <style lang="scss" scoped>
 .buttonClassico:hover {
   box-shadow: 0.25rem 0.25rem black, 0 0 10px rgba(0, 0, 0, 0.2) !important;
@@ -67,9 +73,3 @@ body {
   background-color: $HeaderBgMain;
 }
 </style>
-
-<script setup>
-definePageMeta({
-  layout: "prelogin",
-});
-</script>

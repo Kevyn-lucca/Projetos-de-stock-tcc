@@ -5,7 +5,7 @@ const props = defineProps<{ img: string }>();
 <template>
   <div class="h-64 w-64">
     <div v-if="!props.img" class="h-42 w-64 bg-amber-100 rounded-t-2xl" />
-    <NuxtImg
+    <img
       v-else
       class="h-42 w-72 rounded-t-2xl"
       :src="props.img"

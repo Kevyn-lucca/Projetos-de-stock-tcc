@@ -16,6 +16,6 @@ export default defineNuxtConfig({
     "@formkit/auto-animate/nuxt",
     "@nuxt/ui",
     "@nuxt/eslint",
-    "@nuxt/image",
+    "@nuxtjs/color-mode",
   ],
 });

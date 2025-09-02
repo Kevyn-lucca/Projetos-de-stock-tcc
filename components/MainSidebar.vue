@@ -47,12 +47,15 @@
   </div>
   <div v-else class="p-3.5">
     <button @click="toggleSidebar">
-      <Icon class="h-5 w-5" name="lucide:menu" style="color: white" />
+      <Icon class="h-5 w-5" name="lucide:menu" :style="{ color: colormode }" />
     </button>
   </div>
 </template>
 
 <script setup scoped>
+const color = useColorMode();
+const colormode = color.value === "dark" ? "light" : "dark";
+
 const sidebarStatus = useSidebarStatus();
 let loadItens = false;
 const toggleSidebar = () => {
