@@ -1,3 +1,56 @@
+<script setup lang="ts">
+const filiais = [
+  {
+    id: 1,
+    nome: "Filial Centro",
+    data: "15/03/2018",
+    vendas: 15420,
+    img: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500&auto=format&fit=crop&q=60",
+    filial: true,
+  },
+  {
+    id: 2,
+    nome: "Filial Norte",
+    data: "07/11/2019",
+    vendas: 9870,
+    img: "https://images.unsplash.com/photo-1529429617124-95b109e86bb8?w=500&auto=format&fit=crop&q=60",
+    filial: true,
+  },
+  {
+    id: 3,
+    nome: "Filial Sul",
+    data: "22/06/2020",
+    vendas: 12340,
+    img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500&auto=format&fit=crop&q=60",
+    filial: true,
+  },
+  {
+    id: 4,
+    nome: "Filial Leste",
+    data: "10/02/2021",
+    vendas: 8450,
+    img: "https://images.unsplash.com/photo-1560184897-ae75f4184934?w=500&auto=format&fit=crop&q=60",
+    filial: true,
+  },
+  {
+    id: 5,
+    nome: "Filial Oeste",
+    data: "30/09/2022",
+    vendas: 6920,
+    img: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=500&auto=format&fit=crop&q=60",
+    filial: true,
+  },
+  {
+    id: 6,
+    nome: "Filial Aeroporto",
+    data: "18/05/2023",
+    vendas: 4310,
+    img: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=500&auto=format&fit=crop&q=60",
+    filial: true,
+  },
+];
+</script>
+
 <template>
   <div class="overflow-hidden flex flex-col items-center w-full h-auto">
     <div class="rounded-xl bg-white text-center h-14 mt-4 w-74">
@@ -6,13 +59,14 @@
     <div>
       <section class="grid grid-cols-2 gap-x-32 gap-y-10 mt-16">
         <MainCard
-          v-for="i in 6"
-          :key="i"
-          :img="'https://images.unsplash.com/photo-1594161433013-43d02893c83d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGJha2VyeXN8ZW58MHx8MHx8fDA%3D'"
+          v-for="filial in filiais"
+          :key="filial.id"
+          :img="filial.img"
+          :name="filial.nome"
+          :filial="filial.filial"
+          :vendas="filial.vendas"
         />
       </section>
     </div>
   </div>
 </template>
-
-<script setup></script>

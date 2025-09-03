@@ -1,5 +1,10 @@
 <script setup lang="ts">
-const props = defineProps<{ img: string }>();
+const props = defineProps<{
+  img: string;
+  name: string;
+  filial: boolean;
+  vendas: number;
+}>();
 </script>
 
 <template>
@@ -12,7 +17,7 @@ const props = defineProps<{ img: string }>();
       alt="Minha imagem"
     />
     <div class="h-22 w-64 bg-orange-400">
-      <UModal title="Nome do produto">
+      <UModal :title="props.name">
         <UButton
           class="ml-25 mt-12"
           label="Editar"
@@ -20,7 +25,10 @@ const props = defineProps<{ img: string }>();
           variant="subtle"
         />
         <template #body>
-          <div class="flex justify-around w-full border-b border-gray-300">
+          <div
+            v-if="!props.filial"
+            class="flex justify-around w-full border-b border-gray-300"
+          >
             <div class="px-4 py-2 font-medium dark:text-white text-gray-700">
               Marca
             </div>
@@ -34,7 +42,7 @@ const props = defineProps<{ img: string }>();
             <div
               class="w-full h-32 bg-gray-200 border-2 border-blue-500 rounded flex items-center justify-center text-gray-400"
             >
-              FOTO
+              <img class="h-32 w-auto" :src="props.img" />
             </div>
           </div>
 
@@ -51,7 +59,7 @@ const props = defineProps<{ img: string }>();
             </button>
           </div>
 
-          <div class="px-4 py-3">
+          <div v-if="!props.filial" class="px-4 py-3">
             <h3
               class="text-center text-lg font-semibold dark:text-white text-gray-700"
             >
@@ -62,7 +70,14 @@ const props = defineProps<{ img: string }>();
             >
               <span>Quantidade: 28</span>
               <span>Data da compra: 28/12/2025</span>
-              <span>Vendas: 28</span>
+              <span>Vendas: {{ props.vendas }}</span>
+            </div>
+          </div>
+          <div v-else class="px-4 py-3">
+            <div
+              class="mt-2 flex justify-center text-sm dark:text-white text-gray-700"
+            >
+              <span>Vendas: {{ props.vendas }}</span>
             </div>
           </div>
         </template>

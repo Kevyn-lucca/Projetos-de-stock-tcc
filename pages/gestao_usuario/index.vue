@@ -5,7 +5,6 @@ function changemode() {
   color.preference = color.value === "light" ? "dark" : "light";
 }
 
-// simulação: em produção você buscaria do backend / auth
 const isAdmin = true;
 
 const groups = [
@@ -27,7 +26,7 @@ const groups = [
       {
         label: "Mudar modo",
         icon: "i-lucide-lightbulb",
-        onSelect: changemode, // <- aqui usa click em vez de onclick
+        onSelect: changemode,
       },
     ],
   },
@@ -42,7 +41,6 @@ const groups = [
       class="flex-1 h-auto"
     />
 
-    <!-- Só aparece para administradores -->
     <UButton
       v-if="isAdmin"
       icon="i-lucide-rocket"
