@@ -73,11 +73,17 @@ const props = defineProps<{
               <span>Vendas: {{ props.vendas }}</span>
             </div>
           </div>
-          <div v-else class="px-4 py-3">
+          <div v-else class="px-4 py-3 ml-8 flex place-content-center">
             <div
-              class="mt-2 flex justify-center text-sm dark:text-white text-gray-700"
+              class="hover:border-b-2 hover:border-blue-500 mt-2 flex justify-center w-auto dark:text-white text-gray-700"
             >
-              <span>Vendas: {{ props.vendas }}</span>
+              <span>Vendas: </span>
+              &nbsp;&nbsp;
+              <input
+                type="text"
+                class="focus:outline-none w-18 focus:border-none"
+                :value="props.vendas"
+              />
             </div>
           </div>
         </template>
