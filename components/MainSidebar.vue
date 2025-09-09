@@ -15,11 +15,7 @@
           <UAvatar src="https://github.com/benjamincanac.png" size="xl" />
         </NuxtLink>
       </div>
-      <USeparator
-        class="mt-8"
-        icon="i-simple-icons-nuxtdotjs"
-        color="secondary"
-      />
+      <USeparator class="mt-8" icon="i-lucide-wheat" color="secondary" />
       <div>
         <ul class="flex flex-col text-xl gap-10 mt-15 place-content-around">
           <li>

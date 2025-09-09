@@ -1,20 +1,29 @@
 <template>
-    <div class="flex flex-col place-content-center">
-
-    
-    <div class="TarefaPrincipal pl-2 pb-2">
-        <slot ></slot>
-    </div>
-    </div>
+  <div
+    class="TarefaPrincipal pl-2 pb-2 min-h-[300px]"
+    @dragover.prevent
+    @drop="onDrop"
+  >
+    <slot></slot>
+  </div>
 </template>
 
-<style lang="css" scoped>
-.TarefaPrincipal{
-    background-color: white;
-    width: 20rem;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    place-content: center;
+<script setup>
+const props = defineProps({
+  status: String,
+  color: String,
+});
+const emit = defineEmits(["drop-tarefa"]);
+
+function onDrop() {
+  emit("drop-tarefa", { status: props.status, color: props.color });
+}
+</script>
+
+<style scoped>
+.TarefaPrincipal {
+  width: 20rem;
+  display: flex;
+  flex-direction: column;
 }
 </style>
