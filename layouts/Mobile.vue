@@ -1,7 +1,7 @@
 <template>
   <div>
     <header>
-      <HeaderMain />
+      <NavMobile />
     </header>
     <main>
       <slot />

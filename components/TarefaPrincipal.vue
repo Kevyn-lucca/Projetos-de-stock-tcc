@@ -4,7 +4,7 @@
     @dragover.prevent
     @drop="onDrop"
   >
-    <slot></slot>
+    <slot />
   </div>
 </template>
 
