@@ -1,0 +1,87 @@
+[
+  {
+    "name": "FooterMain",
+    "description": ""
+  },
+  {
+    "name": "HeaderMain",
+    "description": ""
+  },
+  {
+    "name": "MainCard",
+    "props": [
+      {
+        "name": "img",
+        "required": true,
+        "type": {
+          "name": "string"
+        }
+      },
+      {
+        "name": "name",
+        "required": true,
+        "type": {
+          "name": "string"
+        }
+      },
+      {
+        "name": "filial",
+        "required": true,
+        "type": {
+          "name": "boolean"
+        }
+      },
+      {
+        "name": "vendas",
+        "required": true,
+        "type": {
+          "name": "number"
+        }
+      }
+    ],
+    "description": ""
+  },
+  {
+    "name": "MainSidebar",
+    "description": ""
+  },
+  {
+    "name": "NavMobile",
+    "description": ""
+  },
+  {
+    "name": "tarefaBlock",
+    "props": [
+      {
+        "name": "tarefa",
+        "type": {
+          "name": "object"
+        }
+      }
+    ],
+    "description": ""
+  },
+  {
+    "name": "TarefaPrincipal",
+    "props": [
+      {
+        "name": "status",
+        "type": {
+          "name": "string"
+        }
+      },
+      {
+        "name": "color",
+        "type": {
+          "name": "string"
+        }
+      }
+    ],
+    "slots": [
+      {
+        "name": "default"
+      }
+    ],
+    "description": ""
+  }
+]
