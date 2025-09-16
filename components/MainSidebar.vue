@@ -9,10 +9,10 @@
           <Icon class="h-5 w-5" name="lucide:menu" style="color: white" />
         </button>
       </div>
-      <div class="flex gap-4">
-        <h2 class="text-2xl font-bold mb-4 text-white">Nome de usuario</h2>
+      <div class="flex gap-8">
+        <h2 class="text-2xl font-bold mb-4 text-white">Débora Viana</h2>
         <NuxtLink to="/gestao_usuario">
-          <UAvatar src="https://github.com/benjamincanac.png" size="xl" />
+          <UAvatar class="ml-4"  src="https://static-cse.canva.com/blob/2161491/1600w-vkBvE1d_xYA.jpg" size="xl" />
         </NuxtLink>
       </div>
       <USeparator class="mt-8" icon="i-lucide-wheat" color="secondary" />

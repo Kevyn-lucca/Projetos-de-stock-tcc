@@ -29,7 +29,7 @@ const filiais = [
     nome: "Filial Leste",
     data: "10/02/2021",
     vendas: 8450,
-    img: "https://images.unsplash.com/photo-1560184897-ae75f4184934?w=500&auto=format&fit=crop&q=60",
+    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdYeB7u23Ycsufn4SfO3eCL44IKV-Mcvrcog&s",
     filial: true,
   },
   {
@@ -57,7 +57,7 @@ const filiais = [
       <h1 class="p-2 text-black text-center text-4xl">Filiais disponíveis</h1>
     </div>
     <div>
-      <section class="grid grid-cols-2 gap-x-32 gap-y-10 mt-16">
+      <section class="grid grid-cols-2 gap-x-32 gap-y-10 mb-4 mt-16">
         <MainCard
           v-for="filial in filiais"
           :key="filial.id"

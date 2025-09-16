@@ -15,12 +15,12 @@
         placeholder="E-mail"
       />
       <input
-        type="text"
+        type="password"
         class="!appearance-none placeholder:!text-primary-contrast/40 !border-0 !p-4 !w-full !outline-0 !text-xl !mb-6 !bg-white/10 active:bg-white/20 !text-primary-contrast/70 !rounded-full"
         placeholder="Senha"
       />
       <input
-        type="text"
+        type="password"
         class="!appearance-none placeholder:!text-primary-contrast/40 !border-0 !p-4 !w-full !outline-0 !text-xl !mb-6 !bg-white/10 active:bg-white/20 !text-primary-contrast/70 !rounded-full"
         placeholder="Confirme sua senha"
       />

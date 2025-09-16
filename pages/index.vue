@@ -29,11 +29,15 @@
             <div
               class="flex items-center gap-4 justify-center lg:justify-start"
             >
+             <NuxtLink to="/login/cadastro">
               <button
                 class="buttonClassico !border-primary-600 hover:border-none !text-white hover:!text-black hover:!bg-green-800 !bg-green-400"
               >
-                <a href="#">Cadastre-se</a>
+
+                <p>Cadastre-se</p>
               </button>
+                      </NuxtLink>
+
               <button
                 class="buttonClassico !border-primary-600 hover:border-none !text-white hover:!text-black hover:!bg-green-800 !bg-green-400"
               >
