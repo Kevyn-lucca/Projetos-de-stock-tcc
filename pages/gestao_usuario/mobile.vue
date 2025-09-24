@@ -35,7 +35,7 @@ const groups = [
 <template>
   <div>
     <!-- Palette mobile full screen -->
-    <div class="fixed inset-0 z-40 pt-12 flex flex-col bg-[#2c3930] p-4">
+    <div>
       <!-- Command Palette -->
       <UCommandPalette
         :groups="groups"

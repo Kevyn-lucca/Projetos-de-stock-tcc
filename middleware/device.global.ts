@@ -1,4 +1,8 @@
 export default defineNuxtRouteMiddleware((to) => {
+  if (to.path === "/" || to.path.startsWith("/login")) {
+    return;
+  }
+
   const userAgent = import.meta.server
     ? useRequestHeaders(["user-agent"])["user-agent"] || ""
     : navigator.userAgent || "";
@@ -8,11 +12,13 @@ export default defineNuxtRouteMiddleware((to) => {
       userAgent.toLowerCase()
     );
 
-  if (isMobile && !to.path.endsWith("/mobile")) {
-    return navigateTo(`${to.path.replace(/\/$/, "")}/mobile`);
+  const targetPath = to.path.replace(/\/$/, "");
+
+  if (isMobile && !targetPath.endsWith("/mobile")) {
+    return navigateTo(`${targetPath}/mobile`);
   }
 
-  if (!isMobile && to.path.endsWith("/mobile")) {
-    return navigateTo(to.path.replace(/\/mobile$/, "") || "/");
+  if (!isMobile && targetPath.endsWith("/mobile")) {
+    return navigateTo(targetPath.replace(/\/mobile$/, "") || "/");
   }
 });

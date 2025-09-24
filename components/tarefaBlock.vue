@@ -18,7 +18,15 @@
 
 <script setup>
 defineProps({
-  tarefa: Object,
+  tarefa: {
+    type: Object,
+    default: () => ({
+      titulo: "",
+      color: "",
+      id: "",
+      mensagem: "",
+    }),
+  },
 });
 </script>
 
