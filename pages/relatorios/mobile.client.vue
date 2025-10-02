@@ -92,14 +92,12 @@ const relatorios = [
   },
 ];
 
-// --- Pie Chart ---
 const pieData = {
   labels: relatorios.map((r) => r.Causa),
   datasets: [
     {
       data: relatorios.map((r) => r.Percentual),
       backgroundColor: ["#f00", "#0f0", "#00f"],
-      // Ajuste para melhor visualização em telas pequenas (e.g., borda branca)
       borderColor: "#fff",
       borderWidth: 2,
     },
@@ -108,31 +106,30 @@ const pieData = {
 
 const pieOptions = {
   responsive: true,
-  maintainAspectRatio: false, // Importante para controle de altura no mobile
+  maintainAspectRatio: false,
   plugins: {
-    legend: { position: "bottom", labels: { boxWidth: 10 } }, // Legenda menor
-    title: { display: true, text: "Percentual por Causa", font: { size: 14 } }, // Título menor
+    legend: { position: "bottom", labels: { boxWidth: 10 } }, 
+    title: { display: true, text: "Percentual por Causa", font: { size: 14 } }, 
   },
 };
 
-// --- Line Chart ---
 const lineData = {
   labels: relatorios.map((r) => r.Causa),
   datasets: [
     {
       label: "Percentual de Problemas",
       data: relatorios.map((r) => r.Percentual),
-      borderColor: "#064e3b", // Mudando a cor para harmonizar com o tema
-      backgroundColor: "rgba(6, 78, 59, 0.2)", // Cor de fundo suave
-      tension: 0.4, // Curva mais suave
-      fill: true, // Preenche a área abaixo da linha
+      borderColor: "#064e3b",
+      backgroundColor: "rgba(6, 78, 59, 0.2)",
+      tension: 0.4,
+      fill: true,
     },
   ],
 };
 
 const lineOptions = {
   responsive: true,
-  maintainAspectRatio: false, // Importante para controle de altura no mobile
+  maintainAspectRatio: false, 
   plugins: {
     legend: { position: "top", labels: { boxWidth: 10 } },
     title: {
