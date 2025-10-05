@@ -10,8 +10,8 @@
       <p>{{ tarefa.mensagem }}</p>
     </div>
     <div class="itemTarefa">
-      <span>20 agosto</span>
-      <p>avatar</p>
+      <span>{{ tarefa.data }}</span>
+      <UAvatar :src="tarefa.avatar" size="xl" />
     </div>
   </div>
 </template>
@@ -25,6 +25,8 @@ defineProps({
       color: "",
       id: "",
       mensagem: "",
+      data: "",
+      avatar: "",
     }),
   },
 });

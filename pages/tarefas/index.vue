@@ -2,11 +2,7 @@
 <template>
   <div class="flex items-center justify-center h-screen gap-4">
     <!-- Coluna Fazer -->
-    <TarefaPrincipal
-      status="fazer"
-      color="secondary"
-      @drop-tarefa="moverTarefa"
-    >
+    <TarefaPrincipal status="fazer" color="secondary" @drop-tarefa="mover">
       <div class="flex items-center gap-2">
         <Icon
           class="h-5 w-5"
@@ -26,11 +22,7 @@
     </TarefaPrincipal>
 
     <!-- Coluna Fazendo -->
-    <TarefaPrincipal
-      status="fazendo"
-      color="warning"
-      @drop-tarefa="moverTarefa"
-    >
+    <TarefaPrincipal status="fazendo" color="warning" @drop-tarefa="mover">
       <div class="flex gap-2 items-center">
         <Icon class="h-5 w-5" name="lucide:loader" style="color: yellow" />
         <h1 class="text-xl text-center">Fazendo</h1>
@@ -46,7 +38,7 @@
     </TarefaPrincipal>
 
     <!-- Coluna Feito -->
-    <TarefaPrincipal status="feito" color="primary" @drop-tarefa="moverTarefa">
+    <TarefaPrincipal status="feito" color="primary" @drop-tarefa="mover">
       <div class="flex items-center gap-2 ml-2">
         <Icon
           class="h-5 w-5"
@@ -69,43 +61,16 @@
 
 <script setup>
 import { ref } from "vue";
+import { useTarefas } from "@/composables/useTarefas";
 
-//Colocar um maximo de 40 caracteres
-const tarefas = ref([
-  {
-    id: 1,
-    titulo: "COMER UM PUDIM",
-    mensagem: "TESTE DE UMA MESSAGEM MANEIRA",
-    status: "fazer",
-    color: "secondary",
-  },
-  {
-    id: 2,
-    titulo: "Avaliar trabalho",
-    mensagem: "avaliar os trabalhos",
-    status: "fazendo",
-    color: "warning",
-  },
-  {
-    id: 3,
-    titulo: "Dar notas",
-    mensagem: "dar uma nota 10 ao meu grupo(kevyn)",
-    status: "feito",
-    color: "primary",
-  },
-]);
-
+const { tarefas, moverTarefa } = useTarefas();
 const dragItem = ref(null);
 
 function onDragStart(tarefa) {
   dragItem.value = tarefa;
 }
 
-function moverTarefa({ status, color }) {
-  if (dragItem.value) {
-    dragItem.value.status = status;
-    dragItem.value.color = color;
-    dragItem.value = null;
-  }
+function mover({ status, color }) {
+  moverTarefa({ status, color }, dragItem);
 }
 </script>

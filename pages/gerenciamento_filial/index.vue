@@ -53,7 +53,7 @@ const filiais = [
 
 <template>
   <div class="overflow-hidden flex flex-col items-center w-full h-auto">
-    <div class="rounded-xl bg-white text-center h-14 mt-4 w-74">
+    <div class="rounded-xl bg-white text-center h-14 mt-4 w-auto">
       <h1 class="p-2 text-black text-center text-4xl">Filiais disponíveis</h1>
     </div>
     <div>

@@ -10,9 +10,9 @@
         </button>
       </div>
       <div class="flex gap-8">
-        <h2 class="text-2xl font-bold mb-4 text-white">Débora Viana</h2>
+        <h2 class="text-2xl font-bold mb-4 text-white">{{ nome }}</h2>
         <NuxtLink to="/gestao_usuario">
-          <UAvatar class="ml-4"  src="https://static-cse.canva.com/blob/2161491/1600w-vkBvE1d_xYA.jpg" size="xl" />
+          <UAvatar class="ml-4" :src="url" size="xl" />
         </NuxtLink>
       </div>
       <USeparator class="mt-8" icon="i-lucide-wheat" color="secondary" />
@@ -48,19 +48,32 @@
   </div>
 </template>
 
-<script setup scoped>
-const color = useColorMode();
-const colormode = color.value === "dark" ? "light" : "dark";
+<script setup>
+import { ref, onMounted, computed } from "vue";
 
+// Simulação do nome vindo da requisição
+const nome = "Debora viana";
+
+const url = ref("");
+
+function gerarAvatares(nome) {
+  const seed = encodeURIComponent(nome);
+  return `https://api.dicebear.com/8.x/lorelei/svg?seed=${seed}`;
+}
+
+onMounted(() => {
+  url.value = gerarAvatares(nome);
+});
+
+const color = useColorMode();
 const sidebarStatus = useSidebarStatus();
-let loadItens = false;
+
+const colormode = computed(() => (color.value === "dark" ? "light" : "dark"));
+
+const loadItens = ref(false);
+
 const toggleSidebar = () => {
   sidebarStatus.value = !sidebarStatus.value;
-  loadItens = !loadItens;
-  if (sidebarStatus == true) {
-    setTimeout(() => {
-      loadItens = !loadItens;
-    }, 1000);
-  }
+  loadItens.value = !loadItens.value;
 };
 </script>
