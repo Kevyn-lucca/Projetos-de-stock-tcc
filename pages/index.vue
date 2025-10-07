@@ -29,14 +29,13 @@
             <div
               class="flex items-center gap-4 justify-center lg:justify-start"
             >
-             <NuxtLink to="/login/cadastro">
-              <button
-                class="buttonClassico !border-primary-600 hover:border-none !text-white hover:!text-black hover:!bg-green-800 !bg-green-400"
-              >
-
-                <p>Cadastre-se</p>
-              </button>
-                      </NuxtLink>
+              <NuxtLink to="/login/cadastro">
+                <button
+                  class="buttonClassico !border-primary-600 hover:border-none !text-white hover:!text-black hover:!bg-green-800 !bg-green-400"
+                >
+                  <p>Cadastre-se</p>
+                </button>
+              </NuxtLink>
 
               <button
                 class="buttonClassico !border-primary-600 hover:border-none !text-white hover:!text-black hover:!bg-green-800 !bg-green-400"
@@ -53,7 +52,7 @@
           class="absolute lg:hidden inset-0 bg-surface-900/60 dark:bg-surface-900/80 z-10"
         />
         <img
-          src="https://fqjltiegiezfetthbags.supabase.co/storage/v1/render/image/public/block.images/blocks/hero/hero-1.png"
+          src="/hero-1.png"
           alt="hero-1"
           class="h-full w-full object-cover xl:[clip-path:polygon(25%_0,100%_0%,100%_100%,0_100%)]"
         />
