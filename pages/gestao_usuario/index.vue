@@ -77,9 +77,25 @@ const groups = [
     </UButton>
 
     <!-- NOTE: aqui usamos v-model:open (não v-model) -->
-    <UModal v-model:open="isOpen" :title="modalTitle">
+    <UModal v-model:open="isOpen" :title="modalTitle" class="w-auto">
       <template #body>
-        <p>testeeeee {{ modalTitle }}</p>
+        <p v-if="modalTitle != 'Gerenciar usuários'">
+          esses itens não serã implementados para a versão de demonstração
+        </p>
+        <div v-else>
+          <div class="flex gap-4">
+            <MainCard
+              v-for="i in 10"
+              :key="i"
+              :img="`https://i.pravatar.cc/150?img=${i}`"
+              :name="`Funcionário ${i}`"
+              :filial= false
+              :cargo="i % 3 === 0 ? 'Vendedor' : 'Atendente'"
+              :vendas="Math.floor(Math.random() * 100)"
+              :ativo="i % 4 !== 0"
+            />
+          </div>
+        </div>
       </template>
     </UModal>
   </section>
