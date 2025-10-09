@@ -36,12 +36,13 @@
                   <p>Cadastre-se</p>
                 </button>
               </NuxtLink>
-
+              <NuxtLink to="sobre">
               <button
                 class="buttonClassico !border-primary-600 hover:border-none !text-white hover:!text-black hover:!bg-green-800 !bg-green-400"
               >
-                <a href="#">Saiba mais</a>
+                <a href="#">Saiba mais</a> 
               </button>
+              </NuxtLink>
             </div>
           </div>
         </div>
