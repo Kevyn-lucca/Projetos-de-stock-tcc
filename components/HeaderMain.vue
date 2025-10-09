@@ -2,6 +2,7 @@
   <nav class="backgroundhead">
     <div class="flex p-4 place-content-between items-center h-20">
       <div class="flex place-content-between w-2/5">
+        <NuxtLink  to="/">
         <div>
           <img
             src="assets/bread-svgrepo-com(4).svg"
@@ -9,6 +10,7 @@
             class="w-20 h-20"
           />
         </div>
+      </NuxtLink>
       </div>
       <div v-if="false" class="flex w-20 items-center gap-2">
         <a aria-label="Log-out" href="#">
