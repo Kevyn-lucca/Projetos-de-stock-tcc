@@ -9,22 +9,31 @@
       <div class="text-4xl font-medium mb-12 text-primary-contrast">
         Bem vindo
       </div>
+
       <input
+        v-model="email"
         type="text"
         class="!appearance-none placeholder:!text-primary-contrast/40 !border-0 !p-4 !w-full !outline-0 !text-xl !block !mb-6 !bg-white/10 active:bg-white/20 !text-primary-contrast/70 !rounded-full"
         placeholder="E-mail"
       />
+
       <input
-        type="text"
+        v-model="senha"
+        type="password"
         class="!appearance-none placeholder:!text-primary-contrast/40 !border-0 !p-4 !w-full !outline-0 !text-xl !mb-6 !bg-white/10 active:bg-white/20 !text-primary-contrast/70 !rounded-full"
         placeholder="Senha"
       />
+
       <button
         type="button"
         class="max-w-40 w-full rounded-full appearance-none border-0 p-4 outline-0 text-xl mb-6 font-medium bg-white/30 hover:bg-white/40 active:bg-white/20 text-primary-contrast/80 cursor-pointer transition-colors duration-150"
+        @click="handleLogin"
       >
         Fazer login
       </button>
+
+      <p v-if="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</p>
+
       <a
         class="cursor-pointer font-medium block text-center text-primary-contrast"
         >Esqueceu a senha?</a
@@ -33,9 +42,27 @@
   </div>
 </template>
 
-<script setup>
-definePageMeta({
-  layout: false,
-});
-//TODO: tenho que fazer com que o usuario não seja capaz de logar caso usando a url e invadir o site
+<script setup lang="ts">
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAuth } from "~/composables/useAuth";
+
+definePageMeta({ layout: false });
+
+const email = ref("");
+const senha = ref("");
+const errorMessage = ref("");
+
+const router = useRouter();
+const { login } = useAuth();
+
+const handleLogin = async () => {
+  errorMessage.value = "";
+  const success = await login(email.value, senha.value);
+  if (success) {
+    router.push("/controle_inventario"); // rota protegida
+  } else {
+    errorMessage.value = "Email ou senha inválidos";
+  }
+};
 </script>
