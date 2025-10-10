@@ -9,10 +9,15 @@
           <Icon class="h-5 w-5" name="lucide:menu" style="color: white" />
         </button>
       </div>
-      <div class="flex gap-8">
-        <h2 class="text-2xl font-bold mb-4 text-white">{{ nome }}</h2>
+      <div class="flex items-center justify-between w-full mb-4">
+        <h2
+          class="flex-1 text-2xl sm:text-3xl md:text-4xl font-bold text-white truncate"
+          :title="user?.nome"
+        >
+          {{ user?.nome }}
+        </h2>
         <NuxtLink to="/gestao_usuario">
-          <UAvatar class="ml-4" :src="url" size="xl" />
+          <UAvatar :src="url" size="xl" />
         </NuxtLink>
       </div>
       <USeparator class="mt-8" icon="i-lucide-wheat" color="secondary" />
@@ -48,21 +53,23 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted, computed } from "vue";
+<script setup lang="ts">
+import { ref, computed } from "vue";
+import { useAuth } from "~/composables/useAuth"; // importa o composable
 
-// Simulação do nome vindo da requisição
-const nome = "Debora viana";
-
+const { user } = useAuth(); // estado reativo do usuário
 const url = ref("");
 
-function gerarAvatares(nome) {
+// Gera avatar a partir do nome do usuário
+function gerarAvatares(nome: string) {
   const seed = encodeURIComponent(nome);
   return `https://api.dicebear.com/8.x/lorelei/svg?seed=${seed}`;
 }
 
 onMounted(() => {
-  url.value = gerarAvatares(nome);
+  if (user.value?.nome) {
+    url.value = gerarAvatares(user.value.nome);
+  }
 });
 
 const color = useColorMode();

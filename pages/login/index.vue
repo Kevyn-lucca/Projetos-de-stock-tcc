@@ -60,7 +60,8 @@ const handleLogin = async () => {
   errorMessage.value = "";
   const success = await login(email.value, senha.value);
   if (success) {
-    router.push("/controle_inventario"); // rota protegida
+    console.log("entrei");
+    router.push("/controle_inventario");
   } else {
     errorMessage.value = "Email ou senha inválidos";
   }

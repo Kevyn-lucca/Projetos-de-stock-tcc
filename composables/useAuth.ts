@@ -1,17 +1,31 @@
+// composables/useAuth.ts
 import { ref } from "vue";
 import { useRouter, useNuxtApp } from "#app";
 
-const user = ref(null);
+interface Usuario {
+  id: number;
+  nome: string;
+  email: string;
+  perfil: string;
+  idPanificadora?: number | null;
+  token: string; // agora incluímos o token no tipo
+}
+
+const user = ref<Usuario | null>(null);
 
 export function useAuth() {
   const router = useRouter();
-  const { $api } = useNuxtApp(); // pega o Axios injetado
+  const { $api } = useNuxtApp();
 
   const login = async (email: string, senha: string) => {
     try {
       const res = await $api.post("/api/auth/login", { email, senha });
-      user.value = res.data.usuario;
-      return true;
+      if (res.data?.success && res.data.usuario) {
+        // mantém o token junto com os dados do usuário
+        user.value = res.data.usuario;
+        return true;
+      }
+      return false;
     } catch {
       return false;
     }
@@ -20,7 +34,10 @@ export function useAuth() {
   const refreshToken = async () => {
     try {
       const res = await $api.post("/api/auth/refresh");
-      return res.data.token; // retorna o novo access token
+      if (res.data?.token && user.value) {
+        user.value.token = res.data.token; // atualiza o token no estado
+      }
+      return res.data.token;
     } catch {
       user.value = null;
       router.push("/login");
@@ -29,12 +46,21 @@ export function useAuth() {
   };
 
   const logout = async () => {
-    await $api.post("/api/auth/logout");
-    user.value = null;
-    router.push("/login");
+    try {
+      await $api.post("/api/auth/logout", null, {
+        headers: {
+          Authorization: `Bearer ${user.value?.token}`,
+        },
+      });
+    } catch {
+      // ignora erros de logout silenciosamente
+    } finally {
+      user.value = null;
+      router.push("/login");
+    }
   };
 
-  const isAuthenticated = () => !!user.value;
+  const isAuthenticated = () => !!user.value?.token;
 
   return { user, login, refreshToken, logout, isAuthenticated };
 }
