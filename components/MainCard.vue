@@ -1,15 +1,97 @@
 <script setup lang="ts">
+import { ref } from "vue";
+import axios from "axios";
+import { useAuth } from "@/composables/useAuth";
+const first = ref(false);
+
 const props = defineProps<{
   id: string | number;
   img: string;
   name: string;
   marca: string;
   filial: boolean;
-  vendas: number;
   validade: string;
   quantidade: number;
   status: string;
+  ProdutosId: number;
 }>();
+
+const quantidade = ref(props.quantidade);
+const validade = ref(props.validade);
+const status = ref(props.status);
+const carregando = ref(false);
+const emit = defineEmits(["estoqueAlterado"]);
+
+function atualizarEstoque() {
+  emit("estoqueAlterado");
+}
+
+const { user, isAuthenticated } = useAuth();
+
+async function salvarAlteracoes() {
+  if (!isAuthenticated()) {
+    alert("Sessão expirada. Faça login novamente.");
+    return;
+  }
+
+  try {
+    carregando.value = true;
+
+    const payload = {
+      quantidade: quantidade.value,
+      dataValidade: validade.value === "Sem validade" ? null : validade.value, // camelCase
+      status: status.value,
+      idEstoque: Number(props.id),
+      idProduto: Number(props.ProdutosId),
+      idPanificadora: user.value?.idPanificadora,
+    };
+
+    await axios.put(
+      `https://localhost:8443/estoque/update/${props.id}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${user.value?.token}`,
+        },
+      }
+    );
+  } catch (err) {
+    console.error("Erro ao atualizar estoque:", err);
+    alert("Erro ao atualizar estoque");
+  } finally {
+    first.value = false;
+
+    carregando.value = false;
+    atualizarEstoque();
+  }
+}
+
+// ======== DELETAR (DELETE) ========
+async function deletarEstoque() {
+  if (!isAuthenticated()) {
+    alert("Sessão expirada. Faça login novamente.");
+    return;
+  }
+
+  if (!confirm("Deseja realmente deletar este estoque?")) return;
+
+  try {
+    carregando.value = true;
+
+    await axios.delete(`https://localhost:8443/estoque/delete/${props.id}`, {
+      headers: {
+        Authorization: `Bearer ${user.value?.token}`,
+      },
+    });
+  } catch (err) {
+    console.error("Erro ao deletar estoque:", err);
+    alert("Erro ao deletar estoque");
+  } finally {
+    first.value = false;
+    carregando.value = false;
+    atualizarEstoque();
+  }
+}
 </script>
 
 <template>
@@ -25,12 +107,13 @@ const props = defineProps<{
 
     <!-- Corpo principal -->
     <div class="h-22 w-64 bg-orange-400">
-      <UModal :title="props.name">
+      <UModal v-model:open="first" :title="props.name">
         <UButton
           class="ml-25 mt-12"
           label="Editar"
           color="neutral"
           variant="subtle"
+          @click="first = true"
         />
 
         <template #body>
@@ -47,9 +130,9 @@ const props = defineProps<{
             >
               Validade:
               {{
-                props.validade === "Sem validade"
+                validade === "Sem validade"
                   ? "Sem validade"
-                  : new Date(props.validade).toLocaleDateString("pt-BR")
+                  : new Date(validade).toLocaleDateString("pt-BR")
               }}
             </div>
           </div>
@@ -63,56 +146,55 @@ const props = defineProps<{
             </div>
           </div>
 
+          <!-- Inputs de edição -->
+          <div class="px-4 py-3">
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-white"
+              >Quantidade:</label
+            >
+            <input
+              type="number"
+              v-model="quantidade"
+              class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+
+            <select
+              v-model="status"
+              class="w-full mt-1 px-3 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-900 light:bg-white dark:text-white"
+            >
+              <option value="Ok">Ok</option>
+              <option value="Vencido">Vencido</option>
+              <option value="Em falta">Em falta</option>
+            </select>
+
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-white mt-3"
+              >Validade:</label
+            >
+            <input
+              type="date"
+              v-model="validade"
+              class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
           <!-- Botões -->
           <div class="px-4 flex justify-center space-x-4 mb-4">
             <button
               class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+              :disabled="carregando"
+              @click="deletarEstoque"
             >
-              Deletar
+              {{ carregando ? "..." : "Deletar" }}
             </button>
+
             <button
               class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+              :disabled="carregando"
+              @click="salvarAlteracoes"
             >
-              Salvar
+              {{ carregando ? "Salvando..." : "Salvar" }}
             </button>
-          </div>
-
-          <!-- Info detalhada -->
-          <div v-if="!props.filial" class="px-4 py-3">
-            <h3
-              class="text-center text-lg font-semibold dark:text-white text-gray-700"
-            >
-              {{ props.name }}
-            </h3>
-            <div
-              class="mt-2 flex justify-between text-sm dark:text-white text-gray-700"
-            >
-              <span>Quantidade: {{ props.quantidade }}</span>
-              <span
-                >Validade:
-                {{
-                  props.validade === "Sem validade"
-                    ? "—"
-                    : new Date(props.validade).toLocaleDateString("pt-BR")
-                }}</span
-              >
-              <span>Vendas: {{ props.vendas }}</span>
-            </div>
-          </div>
-
-          <!-- Modo Filial -->
-          <div v-else class="px-4 py-3 ml-8 flex place-content-center">
-            <div
-              class="hover:border-b-2 hover:border-blue-500 mt-2 flex justify-center w-auto dark:text-white text-gray-700"
-            >
-              <span>Vendas:</span>
-              &nbsp;&nbsp;
-              <input
-                type="text"
-                class="focus:outline-none w-18 focus:border-none bg-transparent"
-                :value="props.vendas"
-              />
-            </div>
           </div>
         </template>
       </UModal>

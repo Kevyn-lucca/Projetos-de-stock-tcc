@@ -1,6 +1,5 @@
 <template>
   <div class="overflow-hidden flex flex-col items-center w-full h-auto">
-    <!-- Barra de pesquisa e botão -->
     <div
       class="w-full sm:w-96 mx-auto mt-6 flex flex-row gap-4 items-center px-4 sm:px-0"
     >
@@ -26,11 +25,72 @@
       >
         {{ estiloNovo }}
       </UButton>
+      <UModal title="Novo estoque">
+        <UButton
+          size="lg"
+          variant="solid"
+          class="flex-shrink-0"
+          color="primary"
+        >
+          Novo Estoque
+        </UButton>
+        <template #body>
+          <div class="px-4 dark:text-white py-3 flex flex-col gap-4">
+            <div class="flex flex-col">
+              <label class="text-sm font-medium">Produto:</label>
+              <select v-model="novoItem.idProduto" class="input-base">
+                <option
+                  v-for="produto in Produtos"
+                  :key="produto.id"
+                  :value="produto.id"
+                >
+                  {{ produto.nome }}
+                </option>
+              </select>
+            </div>
+
+            <div class="flex dark:text-white flex-col">
+              <label class="text-sm font-medium">Quantidade:</label>
+              <input
+                v-model.number="novoItem.quantidade"
+                type="number"
+                class="input-base"
+                placeholder="Digite a quantidade"
+              />
+            </div>
+            <label
+              class="block text-sm font-medium text-gray-700 dark:text-white mt-3"
+              >Validade:</label
+            >
+            <input
+              type="date"
+              v-model="novoItem.validade"
+              class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+            <div class="flex flex-col">
+              <label class="text-sm dark:text-white font-medium">Status:</label>
+              <select
+                v-model="novoItem.status"
+                class="w-full mt-1 px-3 py-2 hover:bg-gray-900 focus:ring-blue-500 focus:border-blue-500 light:text-black hover:text-white text-white light:bg-white"
+              >
+                <option value="Ok">Ok</option>
+                <option value="Vencido">Vencido</option>
+                <option value="Em falta">Em falta</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mt-4 flex justify-end gap-2">
+            <UButton variant="solid" color="success" @click="criarEstoque">
+              Salvar
+            </UButton>
+          </div>
+        </template>
+      </UModal>
     </div>
 
     <div class="w-full px-4">
       <Transition name="fade" mode="out-in" appear>
-        <!-- BLOCO (MainCard) -->
         <section
           v-if="showColumn"
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-10 w-full"
@@ -46,7 +106,8 @@
             :quantidade="item.quantidade"
             :status="item.status"
             :filial="false"
-            :vendas="item.vendas"
+            :ProdutosId="item.IdProduto"
+            @estoque-alterado="fetchEstoque"
           />
         </section>
 
@@ -111,7 +172,16 @@ type ProdutoFront = {
   img: string;
   vendas: number;
   quantidade: number;
+  IdProduto: number;
 };
+
+type Produto = {
+  id: number;
+  nome: string;
+  marca: string;
+};
+
+const Produtos = ref<Produto[]>([]);
 
 const data = ref<ProdutoFront[]>([]);
 
@@ -123,7 +193,7 @@ function MudarEstilo() {
 const fetchEstoque = async () => {
   loading.value = true;
   error.value = null;
-
+  console.log("teste");
   try {
     const res = await $api.get("https://localhost:8443/estoque", {
       headers: {
@@ -143,6 +213,7 @@ const fetchEstoque = async () => {
         ".png",
       vendas: Math.floor(Math.random() * 50), // valor fictício temporário
       quantidade: item.quantidade,
+      IdProduto: item.produto.id,
     }));
   } catch (err) {
     error.value = "Erro ao carregar estoque.";
@@ -151,6 +222,73 @@ const fetchEstoque = async () => {
     loading.value = false;
   }
 };
+
+const novoItem = ref({
+  idProduto: null,
+  quantidade: 0,
+  status: "Ok",
+  validade: "Não definida",
+  idPanificadora: user.value?.idPanificadora,
+});
+const criarEstoque = async () => {
+  if (!user.value?.token) {
+    alert("Sessão expirada. Faça login novamente.");
+    return;
+  }
+
+  if (!novoItem.value.idProduto) {
+    alert("Selecione um produto.");
+    return;
+  }
+
+  try {
+    const payload = {
+      idProduto: novoItem.value.idProduto,
+      quantidade: novoItem.value.quantidade,
+      dataValidade:
+        novoItem.value.validade === "" ? null : novoItem.value.validade,
+      status: novoItem.value.status,
+      idPanificadora: user.value?.idPanificadora,
+    };
+
+    await $api.post("https://localhost:8443/estoque/criar", payload, {
+      headers: {
+        Authorization: `Bearer ${user.value?.token}`,
+      },
+    });
+
+    novoItem.value = {
+      idProduto: null,
+      quantidade: 0,
+      status: "Ok",
+      validade: "Não definida",
+      idPanificadora: user.value?.idPanificadora,
+    };
+
+    await fetchEstoque();
+  } catch (err) {
+    console.error("Erro ao criar estoque:", err);
+    alert("Erro ao criar estoque. Confira os dados e tente novamente.");
+  }
+};
+const fetchProduto = async () => {
+  loading.value = true;
+  error.value = null;
+
+  try {
+    const res = await $api.get("https://localhost:8443/produtos", {
+      headers: { Authorization: `Bearer ${user.value?.token}` },
+    });
+    Produtos.value = res.data;
+  } catch (err) {
+    error.value = "Erro ao carregar produtos.";
+    console.error(err);
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(fetchProduto);
 
 onMounted(fetchEstoque);
 

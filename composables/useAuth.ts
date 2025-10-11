@@ -8,7 +8,7 @@ interface Usuario {
   email: string;
   perfil: string;
   idPanificadora?: number | null;
-  token: string; // agora incluímos o token no tipo
+  token: string;
 }
 
 const user = ref<Usuario | null>(null);
@@ -21,7 +21,6 @@ export function useAuth() {
     try {
       const res = await $api.post("/api/auth/login", { email, senha });
       if (res.data?.success && res.data.usuario) {
-        // mantém o token junto com os dados do usuário
         user.value = res.data.usuario;
         return true;
       }
@@ -35,7 +34,7 @@ export function useAuth() {
     try {
       const res = await $api.post("/api/auth/refresh");
       if (res.data?.token && user.value) {
-        user.value.token = res.data.token; // atualiza o token no estado
+        user.value.token = res.data.token;
       }
       return res.data.token;
     } catch {
@@ -53,7 +52,7 @@ export function useAuth() {
         },
       });
     } catch {
-      // ignora erros de logout silenciosamente
+      // teste
     } finally {
       user.value = null;
       router.push("/login");
