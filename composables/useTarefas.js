@@ -3,7 +3,6 @@ import { ref, onMounted, watch } from "vue";
 export function useTarefas() {
   const STORAGE_KEY = "tarefas_session";
 
-  // Carrega tarefas da sessão, se existirem
   const tarefas = ref(
     JSON.parse(sessionStorage.getItem(STORAGE_KEY)) || [
       {
@@ -33,7 +32,6 @@ export function useTarefas() {
     ]
   );
 
-  // Gera o avatar para cada tarefa (só se ainda não existir)
   async function gerarAvatares() {
     for (const tarefa of tarefas.value) {
       if (!tarefa.avatar) {
@@ -54,7 +52,6 @@ export function useTarefas() {
     { deep: true }
   );
 
-  // Move tarefa e atualiza estado
   function moverTarefa({ status, color }, dragItem) {
     if (dragItem.value) {
       dragItem.value.status = status;

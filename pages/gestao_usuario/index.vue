@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import { useAuth } from "@/composables/useAuth";
+import MainUsuario from "@/components/MainUsuario.vue";
+
 const color = useColorMode();
+const { user } = useAuth();
 
 const isAdmin = true;
-const isOpen = ref(false); // estado do modal
+const isOpen = ref(false);
 const modalTitle = ref("");
+
 function changemode() {
   color.preference = color.value === "light" ? "dark" : "light";
 }
@@ -54,6 +60,31 @@ const groups = [
     ],
   },
 ];
+
+const usuarios = ref<
+  Array<{
+    id_usuario: number;
+    nome: string;
+    email: string;
+    perfil: string;
+    id_panificadora: number;
+  }>
+>([]);
+const carregando = ref(false);
+
+onMounted(async () => {
+  try {
+    carregando.value = true;
+    const res = await axios.get("https://localhost:8443/usuarios", {
+      headers: { Authorization: `Bearer ${user.value?.token}` },
+    });
+    usuarios.value = res.data;
+  } catch (err) {
+    console.error("Erro ao buscar usuários:", err);
+  } finally {
+    carregando.value = false;
+  }
+});
 </script>
 
 <template>
@@ -76,23 +107,29 @@ const groups = [
       Gerenciar usuários
     </UButton>
 
-    <!-- NOTE: aqui usamos v-model:open (não v-model) -->
     <UModal v-model:open="isOpen" :title="modalTitle" class="w-auto">
       <template #body>
-        <p v-if="modalTitle != 'Gerenciar usuários'">
-          esses itens não serã implementados para a versão de demonstração
+        <p v-if="modalTitle !== 'Gerenciar usuários'">
+          Esses itens não serão implementados para a versão de demonstração.
         </p>
+
         <div v-else>
-          <div class="flex gap-4">
-            <MainCard
-              v-for="i in 10"
-              :key="i"
-              :img="`https://i.pravatar.cc/150?img=${i}`"
-              :name="`Funcionário ${i}`"
-              :filial= false
-              :cargo="i % 3 === 0 ? 'Vendedor' : 'Atendente'"
-              :vendas="Math.floor(Math.random() * 100)"
-              :ativo="i % 4 !== 0"
+          <div v-if="carregando" class="p-4 text-center">
+            Carregando usuários...
+          </div>
+
+          <div
+            v-else
+            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-12 p-4"
+          >
+            <MainUsuario
+              v-for="usuario in usuarios"
+              :id="usuario.id_usuario"
+              :key="usuario.id_usuario"
+              :nome="usuario.nome"
+              :email="usuario.email"
+              :perfil="usuario.perfil"
+              :id_panificadora="usuario.id_panificadora"
             />
           </div>
         </div>

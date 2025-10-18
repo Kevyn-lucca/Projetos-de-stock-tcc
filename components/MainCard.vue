@@ -2,14 +2,15 @@
 import { ref } from "vue";
 import axios from "axios";
 import { useAuth } from "@/composables/useAuth";
+
 const first = ref(false);
+const carregando = ref(false);
 
 const props = defineProps<{
   id: string | number;
   img: string;
   name: string;
   marca: string;
-  filial: boolean;
   validade: string;
   quantidade: number;
   status: string;
@@ -19,7 +20,7 @@ const props = defineProps<{
 const quantidade = ref(props.quantidade);
 const validade = ref(props.validade);
 const status = ref(props.status);
-const carregando = ref(false);
+
 const emit = defineEmits(["estoqueAlterado"]);
 
 function atualizarEstoque() {
@@ -39,7 +40,7 @@ async function salvarAlteracoes() {
 
     const payload = {
       quantidade: quantidade.value,
-      dataValidade: validade.value === "Sem validade" ? null : validade.value, // camelCase
+      dataValidade: validade.value === "Sem validade" ? null : validade.value,
       status: status.value,
       idEstoque: Number(props.id),
       idProduto: Number(props.ProdutosId),
@@ -50,154 +51,165 @@ async function salvarAlteracoes() {
       `https://localhost:8443/estoque/update/${props.id}`,
       payload,
       {
-        headers: {
-          Authorization: `Bearer ${user.value?.token}`,
-        },
+        headers: { Authorization: `Bearer ${user.value?.token}` },
       }
     );
   } catch (err) {
     console.error("Erro ao atualizar estoque:", err);
     alert("Erro ao atualizar estoque");
   } finally {
-    first.value = false;
-
     carregando.value = false;
+    first.value = false;
     atualizarEstoque();
   }
 }
 
-// ======== DELETAR (DELETE) ========
 async function deletarEstoque() {
   if (!isAuthenticated()) {
     alert("Sessão expirada. Faça login novamente.");
     return;
   }
 
-  if (!confirm("Deseja realmente deletar este estoque?")) return;
-
   try {
     carregando.value = true;
 
     await axios.delete(`https://localhost:8443/estoque/delete/${props.id}`, {
-      headers: {
-        Authorization: `Bearer ${user.value?.token}`,
-      },
+      headers: { Authorization: `Bearer ${user.value?.token}` },
     });
   } catch (err) {
     console.error("Erro ao deletar estoque:", err);
     alert("Erro ao deletar estoque");
   } finally {
-    first.value = false;
     carregando.value = false;
+    first.value = false;
     atualizarEstoque();
   }
 }
 </script>
 
 <template>
-  <div class="h-64 w-64">
-    <!-- Imagem -->
-    <div v-if="!props.img" class="h-42 w-64 bg-amber-100 rounded-t-2xl" />
+  <div
+    class="group relative w-64 rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden bg-white dark:bg-zinc-900"
+  >
+    <!-- Imagem do produto -->
     <img
-      v-else
-      class="h-42 w-72 rounded-t-2xl object-cover"
+      v-if="props.img"
       :src="props.img"
       :alt="props.name"
+      class="h-44 w-full object-cover transition-transform duration-300 group-hover:scale-105"
     />
+    <div
+      v-else
+      class="h-44 w-full bg-gradient-to-br from-orange-200 to-yellow-200 flex items-center justify-center text-gray-400 text-sm"
+    >
+      Sem imagem
+    </div>
 
-    <!-- Corpo principal -->
-    <div class="h-22 w-64 bg-orange-400">
-      <UModal v-model:open="first" :title="props.name">
-        <UButton
-          class="ml-25 mt-12"
-          label="Editar"
-          color="neutral"
-          variant="subtle"
-          @click="first = true"
-        />
+    <!-- Informações principais -->
+    <div class="p-4 flex flex-col gap-2">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+        {{ props.name }}
+      </h3>
+      <p class="text-sm text-gray-500 dark:text-gray-300">
+        Marca: {{ props.marca }}
+      </p>
+      <p class="text-sm text-gray-500 dark:text-gray-300">
+        Validade:
+        {{
+          validade === "Sem validade"
+            ? "Sem validade"
+            : new Date(
+                new Date(validade).setDate(new Date(validade).getDate() + 1)
+              ).toLocaleDateString("pt-BR")
+        }}
+      </p>
+      <p class="text-sm text-gray-500 dark:text-gray-300">
+        Quantidade: {{ quantidade }}
+      </p>
 
-        <template #body>
-          <!-- Cabeçalho -->
+      <UButton
+        class="w-full mt-3"
+        color="neutral"
+        variant="subtle"
+        label="Editar"
+        @click="first = true"
+      />
+    </div>
+
+    <!-- MODAL -->
+    <UModal v-model:open="first" :title="`Editar ${props.name}`">
+      <template #body>
+        <div class="flex flex-col gap-4 p-4">
+          <!-- Imagem -->
           <div
-            v-if="!props.filial"
-            class="flex justify-around w-full border-b border-gray-300"
+            class="w-full h-40 border rounded-xl flex items-center justify-center overflow-hidden"
           >
-            <div class="px-4 py-2 font-medium dark:text-white text-gray-700">
-              Marca: {{ props.marca }}
-            </div>
-            <div
-              class="py-2 text-center font-medium dark:text-white text-gray-700"
-            >
-              Validade:
-              {{
-                validade === "Sem validade"
-                  ? "Sem validade"
-                  : new Date(validade).toLocaleDateString("pt-BR")
-              }}
-            </div>
-          </div>
-
-          <!-- Imagem maior -->
-          <div class="p-4">
-            <div
-              class="w-full h-32 bg-gray-200 border-2 border-blue-500 rounded flex items-center justify-center text-gray-400"
-            >
-              <img class="h-32 w-auto" :src="props.img" :alt="props.name" />
-            </div>
-          </div>
-
-          <!-- Inputs de edição -->
-          <div class="px-4 py-3">
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-white"
-              >Quantidade:</label
-            >
-            <input
-              type="number"
-              v-model="quantidade"
-              class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            <img
+              v-if="props.img"
+              :src="props.img"
+              :alt="props.name"
+              class="h-full object-cover"
             />
+            <span v-else class="text-gray-400">Sem imagem</span>
+          </div>
 
+          <!-- Campos -->
+          <div>
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
+              Quantidade
+            </label>
+            <input
+              v-model="quantidade"
+              type="number"
+              class="w-full mt-1 rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
+            />
+          </div>
+
+          <div>
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
+              Status
+            </label>
             <select
               v-model="status"
-              class="w-full mt-1 px-3 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-900 light:bg-white dark:text-white"
+              class="w-full mt-1 rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
             >
               <option value="Ok">Ok</option>
               <option value="Vencido">Vencido</option>
               <option value="Em falta">Em falta</option>
             </select>
+          </div>
 
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-white mt-3"
-              >Validade:</label
-            >
+          <div>
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
+              Validade
+            </label>
             <input
-              type="date"
               v-model="validade"
-              class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              type="date"
+              class="w-full mt-1 rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
             />
           </div>
+        </div>
 
-          <!-- Botões -->
-          <div class="px-4 flex justify-center space-x-4 mb-4">
-            <button
-              class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-              :disabled="carregando"
-              @click="deletarEstoque"
-            >
-              {{ carregando ? "..." : "Deletar" }}
-            </button>
+        <!-- Botões -->
+        <div class="flex justify-end gap-3 px-4 pb-4 mt-2">
+          <button
+            class="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-medium transition"
+            :disabled="carregando"
+            @click="deletarEstoque"
+          >
+            {{ carregando ? "..." : "Deletar" }}
+          </button>
 
-            <button
-              class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
-              :disabled="carregando"
-              @click="salvarAlteracoes"
-            >
-              {{ carregando ? "Salvando..." : "Salvar" }}
-            </button>
-          </div>
-        </template>
-      </UModal>
-    </div>
+          <button
+            class="px-4 py-2 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-medium transition"
+            :disabled="carregando"
+            @click="salvarAlteracoes"
+          >
+            {{ carregando ? "Salvando..." : "Salvar" }}
+          </button>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>

@@ -1,7 +1,5 @@
-<!-- Board.vue -->
 <template>
   <div class="flex items-center justify-center h-screen gap-4">
-    <!-- Coluna Fazer -->
     <TarefaPrincipal status="fazer" color="secondary" @drop-tarefa="mover">
       <div class="flex items-center gap-2">
         <Icon
@@ -21,7 +19,6 @@
       />
     </TarefaPrincipal>
 
-    <!-- Coluna Fazendo -->
     <TarefaPrincipal status="fazendo" color="warning" @drop-tarefa="mover">
       <div class="flex gap-2 items-center">
         <Icon class="h-5 w-5" name="lucide:loader" style="color: yellow" />
@@ -37,7 +34,6 @@
       />
     </TarefaPrincipal>
 
-    <!-- Coluna Feito -->
     <TarefaPrincipal status="feito" color="primary" @drop-tarefa="mover">
       <div class="flex items-center gap-2 ml-2">
         <Icon

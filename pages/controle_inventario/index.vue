@@ -25,12 +25,13 @@
       >
         {{ estiloNovo }}
       </UButton>
-      <UModal title="Novo estoque">
+      <UModal v-model:open="open" title="Novo estoque">
         <UButton
           size="lg"
           variant="solid"
           class="flex-shrink-0"
           color="primary"
+          @click="open = true"
         >
           Novo Estoque
         </UButton>
@@ -63,8 +64,8 @@
               >Validade:</label
             >
             <input
-              type="date"
               v-model="novoItem.validade"
+              type="date"
               class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
             <div class="flex flex-col">
@@ -121,7 +122,6 @@
         </section>
       </Transition>
 
-      <!-- Mensagens -->
       <div v-if="loading" class="text-center text-gray-500 mt-8">
         Carregando estoque...
       </div>
@@ -147,6 +147,7 @@ const estiloNovo = ref("Blocos");
 const searchTerm = ref("");
 const loading = ref(true);
 const error = ref<string | null>(null);
+const open = ref(false);
 
 const UBadge = resolveComponent("UBadge");
 const UIcon = resolveComponent("UIcon");
@@ -193,7 +194,6 @@ function MudarEstilo() {
 const fetchEstoque = async () => {
   loading.value = true;
   error.value = null;
-  console.log("teste");
   try {
     const res = await $api.get("https://localhost:8443/estoque", {
       headers: {
@@ -211,7 +211,6 @@ const fetchEstoque = async () => {
         "/produtos/" +
         (item.produto?.nome?.toLowerCase().replace(/\s+/g, "-") || "default") +
         ".png",
-      vendas: Math.floor(Math.random() * 50), // valor fictício temporário
       quantidade: item.quantidade,
       IdProduto: item.produto.id,
     }));
@@ -264,7 +263,7 @@ const criarEstoque = async () => {
       validade: "Não definida",
       idPanificadora: user.value?.idPanificadora,
     };
-
+    open.value = false;
     await fetchEstoque();
   } catch (err) {
     console.error("Erro ao criar estoque:", err);
@@ -306,9 +305,11 @@ const columns: TableColumn<ProdutoFront>[] = [
     accessorKey: "validade",
     header: "Validade",
     cell: ({ row }) => {
-      const validade = row.getValue("validade");
-      if (validade === "Sem validade") return validade;
-      return new Date(String(validade)).toLocaleDateString("pt-BR");
+      const validade = row.getValue("validade") as string | null;
+      if (!validade || validade === "Sem validade") return "Sem validade";
+      const data = new Date(validade);
+      data.setDate(data.getDate() + 1);
+      return data.toLocaleDateString("pt-BR");
     },
   },
   {

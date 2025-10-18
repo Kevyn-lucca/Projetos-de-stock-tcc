@@ -12,10 +12,25 @@ interface Usuario {
 }
 
 const user = ref<Usuario | null>(null);
+let interceptorsConfigured = false;
 
 export function useAuth() {
   const router = useRouter();
   const { $api } = useNuxtApp();
+
+  if (!interceptorsConfigured && $api) {
+    $api.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          user.value = null;
+          router.push("/login");
+        }
+        return Promise.reject(error);
+      }
+    );
+    interceptorsConfigured = true;
+  }
 
   const login = async (email: string, senha: string) => {
     try {
@@ -47,12 +62,10 @@ export function useAuth() {
   const logout = async () => {
     try {
       await $api.post("/api/auth/logout", null, {
-        headers: {
-          Authorization: `Bearer ${user.value?.token}`,
-        },
+        headers: { Authorization: `Bearer ${user.value?.token}` },
       });
     } catch {
-      // teste
+      console.warn("erro ao realizar logout");
     } finally {
       user.value = null;
       router.push("/login");
