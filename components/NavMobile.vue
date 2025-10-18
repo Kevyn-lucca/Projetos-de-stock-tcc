@@ -8,7 +8,6 @@ import { useColorMode } from "#imports";
 const open = ref(false);
 const panel = ref<HTMLDivElement | null>(null);
 
-// Determina cor dos ícones conforme tema
 const color = useColorMode();
 const iconColor = color.value === "dark" ? "light" : "dark";
 
@@ -33,7 +32,6 @@ watch(open, async (val) => {
 </script>
 
 <template>
-  <!-- Botão hambúrguer (apenas sm e menor) -->
   <UButton
     variant="subtle"
     class="fixed top-3 left-3 z-50"
@@ -43,7 +41,6 @@ watch(open, async (val) => {
     <Icon class="h-6 w-6" name="lucide:menu" :style="{ color: iconColor }" />
   </UButton>
 
-  <!-- Overlay escuro -->
   <div
     v-if="open"
     class="fixed inset-0 bg-black/50 z-40 md:hidden"
@@ -51,7 +48,6 @@ watch(open, async (val) => {
     @click="closeMenu"
   />
 
-  <!-- Painel deslizante lateral -->
   <aside
     ref="panel"
     class="fixed top-0 left-0 h-full w-72 p-4 transition-transform duration-300 ease-in-out"

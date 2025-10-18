@@ -29,7 +29,6 @@ interface PanificadoraResponse {
   telefone: string;
   desativado: boolean;
 }
-// --- Carregar filiais ---
 async function carregarFiliais() {
   carregando.value = true;
   try {
@@ -47,17 +46,14 @@ async function carregarFiliais() {
     }));
   } catch (err) {
     console.error("Erro ao carregar filiais:", err);
-    alert("Erro ao carregar filiais");
   } finally {
     carregando.value = false;
   }
 }
 
-// --- Adicionar filial ---
 async function adicionarFilial() {
   carregando.value = true;
   try {
-    // o backend espera "desativado" em vez de "ativo"
     await axios.post(
       "http://localhost:8080/WebAproject2/GerenciarPanificadora/adicionar",
       {

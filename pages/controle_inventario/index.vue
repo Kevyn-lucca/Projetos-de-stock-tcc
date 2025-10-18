@@ -255,7 +255,6 @@ const criarEstoque = async () => {
     await fetchEstoque();
   } catch (err) {
     console.error("Erro ao criar estoque:", err);
-    alert("Erro ao criar estoque. Confira os dados e tente novamente.");
   }
 };
 
