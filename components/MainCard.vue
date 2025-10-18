@@ -4,13 +4,13 @@ import axios from "axios";
 import { useAuth } from "@/composables/useAuth";
 
 const first = ref(false);
-const carregando = ref(false);
 
 const props = defineProps<{
   id: string | number;
   img: string;
   name: string;
   marca: string;
+  filial: boolean;
   validade: string;
   quantidade: number;
   status: string;
@@ -20,14 +20,14 @@ const props = defineProps<{
 const quantidade = ref(props.quantidade);
 const validade = ref(props.validade);
 const status = ref(props.status);
-
+const carregando = ref(false);
 const emit = defineEmits(["estoqueAlterado"]);
+
+const { user, isAuthenticated } = useAuth();
 
 function atualizarEstoque() {
   emit("estoqueAlterado");
 }
-
-const { user, isAuthenticated } = useAuth();
 
 async function salvarAlteracoes() {
   if (!isAuthenticated()) {
@@ -38,60 +38,52 @@ async function salvarAlteracoes() {
   try {
     carregando.value = true;
 
-    const payload = {
-      quantidade: quantidade.value,
-      dataValidade: validade.value === "Sem validade" ? null : validade.value,
-      status: status.value,
-      idEstoque: Number(props.id),
-      idProduto: Number(props.ProdutosId),
-      idPanificadora: user.value?.idPanificadora,
-    };
-
-    await axios.put(
-      `https://localhost:8443/estoque/update/${props.id}`,
-      payload,
-      {
-        headers: { Authorization: `Bearer ${user.value?.token}` },
-      }
+    const params = new URLSearchParams();
+    params.append("idEstoque", String(props.id));
+    params.append("idProduto", String(props.ProdutosId));
+    params.append("idPanificadora", String(user.value?.idPanificadora || 1));
+    params.append("quantidade", String(quantidade.value));
+    params.append(
+      "dataValidade",
+      validade.value === "Sem validade" ? "" : validade.value
     );
+    params.append("status", status.value);
+
+    await axios.post(
+      "http://localhost:8080/WebAproject2/gerenciarEstoque",
+      params
+    );
+
+    atualizarEstoque();
   } catch (err) {
     console.error("Erro ao atualizar estoque:", err);
-    alert("Erro ao atualizar estoque");
   } finally {
     carregando.value = false;
     first.value = false;
-    atualizarEstoque();
   }
 }
 
 async function deletarEstoque() {
-  if (!isAuthenticated()) {
-    alert("Sessão expirada. Faça login novamente.");
-    return;
-  }
-
   try {
     carregando.value = true;
 
-    await axios.delete(`https://localhost:8443/estoque/delete/${props.id}`, {
-      headers: { Authorization: `Bearer ${user.value?.token}` },
-    });
+    await axios.get(
+      `http://localhost:8080/WebAproject2/gerenciarEstoque?acao=excluir&idEstoque=${props.id}`
+    );
+
+    atualizarEstoque();
   } catch (err) {
     console.error("Erro ao deletar estoque:", err);
-    alert("Erro ao deletar estoque");
   } finally {
     carregando.value = false;
     first.value = false;
-    atualizarEstoque();
   }
 }
 </script>
-
 <template>
   <div
     class="group relative w-64 rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden bg-white dark:bg-zinc-900"
   >
-    <!-- Imagem do produto -->
     <img
       v-if="props.img"
       :src="props.img"

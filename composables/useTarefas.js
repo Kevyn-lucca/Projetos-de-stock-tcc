@@ -1,68 +1,138 @@
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import { useAuth } from "@/composables/useAuth";
 
 export function useTarefas() {
-  const STORAGE_KEY = "tarefas_session";
+  const { user, isAuthenticated } = useAuth();
 
-  const tarefas = ref(
-    JSON.parse(sessionStorage.getItem(STORAGE_KEY)) || [
-      {
-        id: 1,
-        titulo: "COMER UM PUDIM",
-        mensagem: "TESTE DE UMA MESSAGEM MANEIRA",
-        status: "fazer",
-        color: "secondary",
-        data: "28/12/2003",
-      },
-      {
-        id: 2,
-        titulo: "Avaliar trabalho",
-        mensagem: "avaliar os trabalhos",
-        status: "fazendo",
-        color: "warning",
-        data: "28/12/2001",
-      },
-      {
-        id: 3,
-        titulo: "Dar notas",
-        mensagem: "dar uma nota 10 ao meu grupo(kevyn)",
-        status: "feito",
-        color: "primary",
-        data: "28/12/2000",
-      },
-    ]
-  );
+  const tarefas = ref([]);
+  const carregando = ref(false);
+  const erro = ref(null);
 
-  async function gerarAvatares() {
-    for (const tarefa of tarefas.value) {
-      if (!tarefa.avatar) {
-        const seed = encodeURIComponent(tarefa.titulo.trim());
-        tarefa.avatar = `https://api.dicebear.com/8.x/lorelei/svg?seed=${seed}`;
-      }
+  const API_URL = "http://localhost:8080/WebAproject2/GerenciarTarefa";
+
+  function gerarAvatar(nomeUsuario) {
+    const seed = encodeURIComponent(nomeUsuario.trim());
+    return `https://api.dicebear.com/8.x/lorelei/svg?seed=${seed}`;
+  }
+
+  async function carregarTarefas() {
+    if (!isAuthenticated()) return;
+
+    carregando.value = true;
+    erro.value = null;
+
+    try {
+      const idUsuario = user.value?.id ?? null;
+
+      const res = await axios.get(API_URL, {
+        params: {
+          acao: "listar",
+          idUsuario,
+        },
+      });
+
+      tarefas.value = (res.data || []).map((t) => ({
+        idTarefa: t.idTarefa,
+        titulo: t.titulo,
+        mensagem: t.mensagem,
+        status: t.status,
+        color: t.color,
+        dataCriacao: t.dataCriacao,
+        idUsuario: t.idUsuario,
+        avatar: gerarAvatar(t.nomeUsuario || "Usuário"),
+      }));
+    } catch (err) {
+      console.error("❌ Erro ao carregar tarefas:", err);
+      erro.value = "Falha ao carregar tarefas.";
+    } finally {
+      carregando.value = false;
     }
   }
 
-  onMounted(() => gerarAvatares());
+  async function adicionarTarefa(nova) {
+    try {
+      carregando.value = true;
 
-  // Atualiza o sessionStorage sempre que o array muda
-  watch(
-    tarefas,
-    (val) => {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(val));
-    },
-    { deep: true }
-  );
+      const payload = {
+        titulo: nova.titulo,
+        mensagem: nova.mensagem,
+        status: nova.status || "fazer",
+        color: nova.color || "secondary",
+        idUsuario: user.value?.id ?? null,
+      };
+
+      const res = await axios.post(API_URL, payload);
+
+      const tarefa = res.data;
+      tarefa.avatar = gerarAvatar(tarefa.titulo);
+      tarefas.value.push(tarefa);
+    } catch (err) {
+      console.log("erro ao adicionar tarefas" + err);
+    } finally {
+      carregando.value = false;
+    }
+  }
+
+  async function atualizarTarefa(tarefa) {
+    try {
+      carregando.value = true;
+
+      await axios.put(API_URL, tarefa);
+
+      const index = tarefas.value.findIndex(
+        (t) => t.idTarefa === tarefa.idTarefa
+      );
+      if (index !== -1) {
+        tarefas.value[index] = {
+          ...tarefa,
+          avatar: gerarAvatar(tarefa.titulo),
+        };
+      }
+    } catch (err) {
+      console.error("Erro ao atualizar tarefa:", err);
+    } finally {
+      carregando.value = false;
+    }
+  }
+
+  async function deletarTarefa(idTarefa) {
+    try {
+      carregando.value = true;
+
+      await axios.delete(API_URL, {
+        params: { idTarefa },
+      });
+
+      tarefas.value = tarefas.value.filter((t) => t.idTarefa !== idTarefa);
+    } catch (err) {
+      console.error("❌ Erro ao deletar tarefa:", err);
+    } finally {
+      carregando.value = false;
+    }
+  }
 
   function moverTarefa({ status, color }, dragItem) {
     if (dragItem.value) {
       dragItem.value.status = status;
       dragItem.value.color = color;
+      atualizarTarefa(dragItem.value);
       dragItem.value = null;
     }
   }
 
+  onMounted(() => {
+    carregarTarefas();
+  });
+
   return {
     tarefas,
-    gerarAvatares,
+    carregando,
+    erro,
+    carregarTarefas,
+    adicionarTarefa,
+    atualizarTarefa,
+    deletarTarefa,
     moverTarefa,
   };
 }

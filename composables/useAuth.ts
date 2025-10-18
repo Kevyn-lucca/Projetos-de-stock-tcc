@@ -1,6 +1,6 @@
 // composables/useAuth.ts
 import { ref } from "vue";
-import { useRouter, useNuxtApp } from "#app";
+import { useRouter } from "#app";
 
 interface Usuario {
   id: number;
@@ -11,68 +11,41 @@ interface Usuario {
   token: string;
 }
 
-const user = ref<Usuario | null>(null);
-let interceptorsConfigured = false;
+const user = ref<Usuario | null>({
+  id: 1,
+  nome: "Usuário Teste",
+  email: "teste@teste.com",
+  perfil: "admin",
+  idPanificadora: null,
+  token: "fake-token",
+});
 
 export function useAuth() {
   const router = useRouter();
-  const { $api } = useNuxtApp();
 
-  if (!interceptorsConfigured && $api) {
-    $api.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        if (error.response?.status === 401 || error.response?.status === 403) {
-          user.value = null;
-          router.push("/login");
-        }
-        return Promise.reject(error);
-      }
-    );
-    interceptorsConfigured = true;
-  }
-
-  const login = async (email: string, senha: string) => {
-    try {
-      const res = await $api.post("/api/auth/login", { email, senha });
-      if (res.data?.success && res.data.usuario) {
-        user.value = res.data.usuario;
-        return true;
-      }
-      return false;
-    } catch {
-      return false;
-    }
+  const login = async (_email: string, _senha: string) => {
+    user.value = {
+      id: 1,
+      nome: "Usuário Teste",
+      email: "teste@teste.com",
+      perfil: "admin",
+      idPanificadora: null,
+      token: "fake-token",
+    };
+    return true;
   };
 
   const refreshToken = async () => {
-    try {
-      const res = await $api.post("/api/auth/refresh");
-      if (res.data?.token && user.value) {
-        user.value.token = res.data.token;
-      }
-      return res.data.token;
-    } catch {
-      user.value = null;
-      router.push("/login");
-      return null;
-    }
+    // Sempre retorna o token fake
+    return user.value?.token || null;
   };
 
   const logout = async () => {
-    try {
-      await $api.post("/api/auth/logout", null, {
-        headers: { Authorization: `Bearer ${user.value?.token}` },
-      });
-    } catch {
-      console.warn("erro ao realizar logout");
-    } finally {
-      user.value = null;
-      router.push("/login");
-    }
+    // Opcional: podemos apenas redirecionar sem limpar o usuário
+    router.push("/login");
   };
 
-  const isAuthenticated = () => !!user.value?.token;
+  const isAuthenticated = () => true; // Sempre autenticado
 
   return { user, login, refreshToken, logout, isAuthenticated };
 }

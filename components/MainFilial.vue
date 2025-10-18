@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import axios from "axios";
-import { useAuth } from "@/composables/useAuth";
-
-const { user, isAuthenticated } = useAuth();
 
 const props = defineProps<{
   id: number;
@@ -16,10 +13,6 @@ const props = defineProps<{
 
 const modalAberto = ref(false);
 const carregando = ref(false);
-const filiais = ref<
-  { id: number; nome: string; img?: string; filial: boolean }[]
->([]);
-const filialSelecionada = ref<number | null>(null);
 
 const editNome = ref(props.nome);
 const editCnpj = ref(props.cnpj);
@@ -32,31 +25,28 @@ function atualizarFilial() {
   emit("filialAlterada");
 }
 
+// --- Atualizar filial ---
 async function salvarAlteracoes() {
-  if (!isAuthenticated()) {
-    alert("Sessão expirada. Faça login novamente.");
-    return;
-  }
-
   try {
     carregando.value = true;
 
     const payload = {
+      idPanificadora: props.id,
       nome: editNome.value,
       cnpj: editCnpj.value,
       endereco: editEndereco.value,
       telefone: editTelefone.value,
+      desativado: !props.ativo, // compatível com o backend
     };
 
     await axios.put(
-      `https://localhost:8443/panificadora/update/${props.id}`,
-      payload,
-      { headers: { Authorization: `Bearer ${user.value?.token}` } }
+      "http://localhost:8080/WebAproject2/GerenciarPanificadora",
+      payload
     );
 
+    alert("Filial atualizada com sucesso!");
     modalAberto.value = false;
     atualizarFilial();
-    alert("Filial atualizada com sucesso!");
   } catch (err) {
     console.error("Erro ao atualizar filial:", err);
     alert("Erro ao atualizar filial");
@@ -65,46 +55,31 @@ async function salvarAlteracoes() {
   }
 }
 
+// --- Desativar / Reativar filial ---
 async function toggleStatusFilial() {
-  if (!isAuthenticated()) {
-    alert("Sessão expirada. Faça login novamente.");
-    return;
-  }
-
-  const acao = props.ativo ? "desativar" : "reativar";
-
   try {
     carregando.value = true;
 
-    // Usando PUT para desativar/reativar (mais semântico que DELETE)
+    const payload = {
+      idPanificadora: props.id,
+      desativado: props.ativo, // ativo=true → desativar
+    };
+
     await axios.put(
-      `https://localhost:8443/panificadora/${acao}/${props.id}`,
-      {},
-      { headers: { Authorization: `Bearer ${user.value?.token}` } }
+      "http://localhost:8080/WebAproject2/GerenciarPanificadora",
+      payload
     );
 
+    alert(`Filial ${props.ativo ? "desativada" : "reativada"} com sucesso!`);
     modalAberto.value = false;
     atualizarFilial();
-    alert(`Filial ${props.ativo ? "desativada" : "reativada"} com sucesso!`);
-  } catch (err: unknown) {
-    console.error(`Erro ao ${acao} filial:`, err);
+  } catch (err) {
+    console.error("Erro ao alterar status da filial:", err);
+    alert("Erro ao alterar status da filial");
   } finally {
     carregando.value = false;
   }
 }
-
-// Lifecycle
-onMounted(async () => {
-  try {
-    const res = await axios.get("https://localhost:8443/panificadora", {
-      headers: { Authorization: `Bearer ${user.value?.token}` },
-    });
-    filiais.value = res.data;
-    filialSelecionada.value = props.id;
-  } catch (err) {
-    console.error("Erro ao buscar filiais:", err);
-  }
-});
 </script>
 
 <template>
@@ -128,7 +103,7 @@ onMounted(async () => {
       {{ props.ativo ? "Ativa" : "Inativa" }}
     </div>
 
-    <!-- Imagem da filial -->
+    <!-- Imagem -->
     <div
       class="h-44 w-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-400 text-sm"
     >
@@ -138,7 +113,7 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- Informações básicas -->
+    <!-- Informações -->
     <div class="p-4 flex flex-col gap-2">
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
         {{ props.nome }}
@@ -167,7 +142,7 @@ onMounted(async () => {
           <input
             v-model="editNome"
             type="text"
-            class="w-full mt-1 rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            class="w-full mt-1 rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           />
         </div>
 
@@ -179,7 +154,7 @@ onMounted(async () => {
           <input
             v-model="editCnpj"
             type="text"
-            class="w-full mt-1 rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            class="w-full mt-1 rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           />
         </div>
 
@@ -191,7 +166,7 @@ onMounted(async () => {
           <input
             v-model="editEndereco"
             type="text"
-            class="w-full mt-1 rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            class="w-full mt-1 rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           />
         </div>
 
@@ -203,7 +178,7 @@ onMounted(async () => {
           <input
             v-model="editTelefone"
             type="text"
-            class="w-full mt-1 rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            class="w-full mt-1 rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           />
         </div>
 
@@ -224,14 +199,14 @@ onMounted(async () => {
 
           <div class="flex gap-3">
             <button
-              class="px-4 py-2 rounded-lg bg-gray-400 hover:bg-gray-500 text-white font-medium transition-colors"
+              class="px-4 py-2 rounded-lg bg-gray-400 hover:bg-gray-500 text-white font-medium"
               :disabled="carregando"
               @click="modalAberto = false"
             >
               Cancelar
             </button>
             <button
-              class="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium transition-colors"
+              class="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium"
               :disabled="carregando"
               @click="salvarAlteracoes"
             >

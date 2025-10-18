@@ -131,7 +131,6 @@
     </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import { h, resolveComponent, ref, computed, onMounted } from "vue";
 import type { TableColumn } from "@nuxt/ui";
@@ -147,7 +146,6 @@ const estiloNovo = ref("Blocos");
 const searchTerm = ref("");
 const loading = ref(true);
 const error = ref<string | null>(null);
-const open = ref(false);
 
 const UBadge = resolveComponent("UBadge");
 const UIcon = resolveComponent("UIcon");
@@ -155,12 +153,16 @@ const UIcon = resolveComponent("UIcon");
 type ProdutoAPI = {
   idEstoque: number;
   produto: {
-    id: number;
+    idProduto: number;
     nome: string;
     marca: string;
+    categoria: string;
+    unidadeMedida: string;
+    perecivel: boolean;
   };
+  idPanificadora: number;
   quantidade: number;
-  dataValidade: string | null;
+  dataValidade?: string | null;
   status: string;
 };
 
@@ -169,9 +171,8 @@ type ProdutoFront = {
   nome: string;
   marca: string;
   validade: string;
-  status: "ok" | "falta" | "reabastecimento";
+  status: string;
   img: string;
-  vendas: number;
   quantidade: number;
   IdProduto: number;
 };
@@ -182,8 +183,8 @@ type Produto = {
   marca: string;
 };
 
+const open = ref(false);
 const Produtos = ref<Produto[]>([]);
-
 const data = ref<ProdutoFront[]>([]);
 
 function MudarEstilo() {
@@ -194,28 +195,30 @@ function MudarEstilo() {
 const fetchEstoque = async () => {
   loading.value = true;
   error.value = null;
-  try {
-    const res = await $api.get("https://localhost:8443/estoque", {
-      headers: {
-        Authorization: `Bearer ${user.value?.token}`,
-      },
-    });
 
+  try {
+    const res = await $api.get(
+      "http://localhost:8080/WebAproject2/gerenciarEstoque?acao=listar"
+    );
+
+    // Ajuste do mapeamento conforme o JSON
     data.value = res.data.map((item: ProdutoAPI) => ({
       id: String(item.idEstoque),
       nome: item.produto?.nome || "Desconhecido",
       marca: item.produto?.marca || "Indefinida",
-      validade: item.dataValidade ?? "Sem validade",
-      status: item.status?.toLowerCase() || "ok",
+      validade: item.dataValidade || "Sem validade",
+      status:
+        item.status?.toUpperCase() === "ATIVO"
+          ? "ok"
+          : item.status?.toLowerCase() || "indefinido",
       img:
         "/produtos/" +
         (item.produto?.nome?.toLowerCase().replace(/\s+/g, "-") || "default") +
         ".png",
       quantidade: item.quantidade,
-      IdProduto: item.produto.id,
+      IdProduto: item.produto?.idProduto,
     }));
   } catch (err) {
-    error.value = "Erro ao carregar estoque.";
     console.error("Erro na requisição:", err);
   } finally {
     loading.value = false;
@@ -226,69 +229,71 @@ const novoItem = ref({
   idProduto: null,
   quantidade: 0,
   status: "Ok",
-  validade: "Não definida",
+  validade: "",
   idPanificadora: user.value?.idPanificadora,
 });
-const criarEstoque = async () => {
-  if (!user.value?.token) {
-    alert("Sessão expirada. Faça login novamente.");
-    return;
-  }
 
+const criarEstoque = async () => {
   if (!novoItem.value.idProduto) {
     alert("Selecione um produto.");
     return;
   }
 
   try {
-    const payload = {
-      idProduto: novoItem.value.idProduto,
-      quantidade: novoItem.value.quantidade,
-      dataValidade:
-        novoItem.value.validade === "" ? null : novoItem.value.validade,
-      status: novoItem.value.status,
-      idPanificadora: user.value?.idPanificadora,
-    };
+    const params = new URLSearchParams();
+    params.append("idProduto", String(novoItem.value.idProduto));
+    params.append("quantidade", String(novoItem.value.quantidade));
+    params.append("dataValidade", novoItem.value.validade || "");
+    params.append("status", novoItem.value.status);
+    params.append("idPanificadora", String(user.value?.idPanificadora || 1));
 
-    await $api.post("https://localhost:8443/estoque/criar", payload, {
-      headers: {
-        Authorization: `Bearer ${user.value?.token}`,
-      },
-    });
+    await $api.post(
+      "http://localhost:8080/WebAproject2/gerenciarEstoque",
+      params
+    );
 
-    novoItem.value = {
-      idProduto: null,
-      quantidade: 0,
-      status: "Ok",
-      validade: "Não definida",
-      idPanificadora: user.value?.idPanificadora,
-    };
-    open.value = false;
     await fetchEstoque();
   } catch (err) {
     console.error("Erro ao criar estoque:", err);
     alert("Erro ao criar estoque. Confira os dados e tente novamente.");
   }
 };
+
 const fetchProduto = async () => {
   loading.value = true;
   error.value = null;
 
   try {
-    const res = await $api.get("https://localhost:8443/produtos", {
-      headers: { Authorization: `Bearer ${user.value?.token}` },
-    });
-    Produtos.value = res.data;
+    const res = await $api.get(
+      "http://localhost:8080/WebAproject2/gerenciarProduto?acao=listar"
+    );
+
+    // tipo correto para o retorno da API
+    type ProdutoAPIResponse = {
+      idProduto: number;
+      nome: string;
+      categoria: string;
+      unidadeMedida: string;
+      perecivel: boolean;
+      marca: string;
+    };
+
+    const produtosAPI: ProdutoAPIResponse[] = res.data;
+
+    Produtos.value = produtosAPI.map((item) => ({
+      id: item.idProduto,
+      nome: item.nome,
+      marca: item.marca,
+    }));
   } catch (err) {
     error.value = "Erro ao carregar produtos.";
-    console.error(err);
+    console.error("Erro ao carregar produtos:", err);
   } finally {
     loading.value = false;
   }
 };
 
 onMounted(fetchProduto);
-
 onMounted(fetchEstoque);
 
 const filteredData = computed(() => {
@@ -305,22 +310,21 @@ const columns: TableColumn<ProdutoFront>[] = [
     accessorKey: "validade",
     header: "Validade",
     cell: ({ row }) => {
-      const validade = row.getValue("validade") as string | null;
-      if (!validade || validade === "Sem validade") return "Sem validade";
-      const data = new Date(validade);
-      data.setDate(data.getDate() + 1);
-      return data.toLocaleDateString("pt-BR");
+      const validade = row.getValue("validade");
+      if (validade === "Sem validade") return validade;
+      return new Date(String(validade)).toLocaleDateString("pt-BR");
     },
   },
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const color = {
-        ok: "success" as const,
-        falta: "error" as const,
-        reabastecimento: "warning" as const,
-      }[row.getValue("status") as string];
+      const color =
+        row.getValue("status") === "ok"
+          ? "success"
+          : row.getValue("status") === "falta"
+          ? "error"
+          : "warning";
       return h(UBadge, { class: "capitalize", variant: "subtle", color }, () =>
         row.getValue("status")
       );

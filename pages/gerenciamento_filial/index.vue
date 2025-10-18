@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import axios from "axios";
-import { useAuth } from "@/composables/useAuth";
 import MainFilial from "@/components/MainFilial.vue";
 
-const { user, isAuthenticated } = useAuth();
 const filiais = ref<
   Array<{
     id: number;
@@ -15,6 +13,7 @@ const filiais = ref<
     ativo: boolean;
   }>
 >([]);
+
 const carregando = ref(false);
 const modalAdicionar = ref(false);
 const novaFilialNome = ref("");
@@ -22,15 +21,30 @@ const novaFilialCnpj = ref("");
 const novaFilialEndereco = ref("");
 const novaFilialTelefone = ref("");
 
+interface PanificadoraResponse {
+  idPanificadora: number;
+  nome: string;
+  cnpj: string;
+  endereco: string;
+  telefone: string;
+  desativado: boolean;
+}
+// --- Carregar filiais ---
 async function carregarFiliais() {
-  if (!isAuthenticated()) return;
-
   carregando.value = true;
   try {
-    const res = await axios.get("https://localhost:8443/panificadora", {
-      headers: { Authorization: `Bearer ${user.value?.token}` },
-    });
-    filiais.value = res.data;
+    const res = await axios.get(
+      "http://localhost:8080/WebAproject2/GerenciarPanificadora?acao=listar"
+    );
+
+    filiais.value = (res.data as PanificadoraResponse[]).map((f) => ({
+      id: f.idPanificadora,
+      nome: f.nome,
+      cnpj: f.cnpj,
+      endereco: f.endereco,
+      telefone: f.telefone,
+      ativo: !f.desativado,
+    }));
   } catch (err) {
     console.error("Erro ao carregar filiais:", err);
     alert("Erro ao carregar filiais");
@@ -39,36 +53,30 @@ async function carregarFiliais() {
   }
 }
 
+// --- Adicionar filial ---
 async function adicionarFilial() {
-  if (!isAuthenticated()) {
-    alert("Sessão expirada. Faça login novamente.");
-    return;
-  }
-
   carregando.value = true;
   try {
+    // o backend espera "desativado" em vez de "ativo"
     await axios.post(
-      "https://localhost:8443/panificadora/adicionar",
+      "http://localhost:8080/WebAproject2/GerenciarPanificadora/adicionar",
       {
         nome: novaFilialNome.value,
         cnpj: novaFilialCnpj.value,
         endereco: novaFilialEndereco.value,
         telefone: novaFilialTelefone.value,
-        ativo: true,
-      },
-      { headers: { Authorization: `Bearer ${user.value?.token}` } }
+        desativado: false,
+      }
     );
-    alert("Filial adicionada com sucesso!");
-    // Limpar campos
+
     novaFilialNome.value = "";
     novaFilialCnpj.value = "";
     novaFilialEndereco.value = "";
     novaFilialTelefone.value = "";
     modalAdicionar.value = false;
-    carregarFiliais();
+    await carregarFiliais();
   } catch (err) {
     console.error("Erro ao adicionar filial:", err);
-    alert("Erro ao adicionar filial");
   } finally {
     carregando.value = false;
   }
@@ -109,13 +117,14 @@ onMounted(() => {
       />
     </section>
 
+    <!-- Modal -->
     <UModal v-model:open="modalAdicionar" title="Adicionar nova filial">
       <template #body>
         <div class="flex flex-col gap-4 p-4">
           <div>
-            <label class="text-sm font-medium text-gray-700 dark:text-gray-200"
-              >Nome</label
-            >
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
+              Nome
+            </label>
             <input
               v-model="novaFilialNome"
               type="text"
@@ -123,10 +132,11 @@ onMounted(() => {
               placeholder="Digite o nome da filial"
             />
           </div>
+
           <div>
-            <label class="text-sm font-medium text-gray-700 dark:text-gray-200"
-              >CNPJ</label
-            >
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
+              CNPJ
+            </label>
             <input
               v-model="novaFilialCnpj"
               type="text"
@@ -134,10 +144,11 @@ onMounted(() => {
               placeholder="Digite o CNPJ"
             />
           </div>
+
           <div>
-            <label class="text-sm font-medium text-gray-700 dark:text-gray-200"
-              >Endereço</label
-            >
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
+              Endereço
+            </label>
             <input
               v-model="novaFilialEndereco"
               type="text"
@@ -145,10 +156,11 @@ onMounted(() => {
               placeholder="Digite o endereço"
             />
           </div>
+
           <div>
-            <label class="text-sm font-medium text-gray-700 dark:text-gray-200"
-              >Telefone</label
-            >
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
+              Telefone
+            </label>
             <input
               v-model="novaFilialTelefone"
               type="text"
@@ -156,6 +168,7 @@ onMounted(() => {
               placeholder="Digite o telefone"
             />
           </div>
+
           <div class="flex justify-end gap-3 mt-4">
             <button
               class="px-4 py-2 rounded-lg bg-gray-400 hover:bg-gray-500 text-white font-medium"
@@ -163,6 +176,7 @@ onMounted(() => {
             >
               Cancelar
             </button>
+
             <button
               class="px-4 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-white font-medium"
               :disabled="carregando || !novaFilialNome.trim()"
