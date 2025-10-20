@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import axios from "axios";
-import { useAuth } from "@/composables/useAuth";
-
-const { user, isAuthenticated } = useAuth();
 
 const props = defineProps<{
   id: number;
@@ -28,68 +25,55 @@ function atualizarUsuarios() {
 }
 
 async function salvarAlteracoes() {
-  if (!isAuthenticated()) {
-    alert("Sessão expirada. Faça login novamente.");
-    return;
-  }
-
   try {
     carregando.value = true;
 
     const payload = {
+      id_usuario: props.id,
       nome: editNome.value,
       email: editEmail.value,
       perfil: editPerfil.value,
-      id_panificadora: editPanificadora.value,
+      idPanificadora: editPanificadora.value,
     };
 
     await axios.put(
-      `https://localhost:8443/usuarios/update/${props.id}`,
+      "http://localhost:8080/WebAproject2/GerenciarUsuario",
       payload,
-      { headers: { Authorization: `Bearer ${user.value?.token}` } }
+      {
+        headers: { "Content-Type": "application/json" },
+      }
     );
 
     modalAberto.value = false;
     atualizarUsuarios();
-    alert("Usuário atualizado com sucesso!");
-  } catch (err: unknown) {
+  } catch (err) {
     console.error("Erro ao atualizar usuário:", err);
-    alert("Erro ao atualizar usuário!");
+    alert("Falha ao salvar alterações do usuário.");
   } finally {
     carregando.value = false;
   }
 }
 
 async function deletarUsuario() {
-  if (!isAuthenticated()) {
-    alert("Sessão expirada. Faça login novamente.");
-    return;
-  }
-  console.log(props.id);
-
   try {
     carregando.value = true;
 
-    await axios.delete(`https://localhost:8443/usuarios/delete/${props.id}`, {
-      headers: { Authorization: `Bearer ${user.value?.token}` },
+    // DELETE com parâmetro idUsuario
+    await axios.delete("http://localhost:8080/WebAproject2/GerenciarUsuario", {
+      params: { idUsuario: props.id },
     });
 
     modalAberto.value = false;
     atualizarUsuarios();
-    alert("Usuário deletado com sucesso!");
-  } catch (err: unknown) {
+  } catch (err) {
     console.error("Erro ao deletar usuário:", err);
-    alert("Erro ao deletar usuário!");
   } finally {
     carregando.value = false;
   }
 }
-
-// Lifecycle
 </script>
 
 <template>
-  <!-- Card do Usuário -->
   <div
     class="group relative w-64 rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden cursor-pointer bg-white dark:bg-zinc-900 border-2 border-transparent hover:border-blue-500"
     @click="modalAberto = true"
@@ -119,15 +103,15 @@ async function deletarUsuario() {
     </div>
   </div>
 
-  <!-- Modal de edição -->
+  <!-- Modal -->
   <UModal v-model:open="modalAberto" :title="`Editar ${props.nome}`">
     <template #body>
       <div class="flex flex-col gap-4 p-4">
         <!-- Nome -->
         <div>
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
-            Nome
-          </label>
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-200"
+            >Nome</label
+          >
           <input
             v-model="editNome"
             type="text"
@@ -137,9 +121,9 @@ async function deletarUsuario() {
 
         <!-- Email -->
         <div>
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
-            E-mail
-          </label>
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-200"
+            >E-mail</label
+          >
           <input
             v-model="editEmail"
             type="email"
@@ -149,26 +133,24 @@ async function deletarUsuario() {
 
         <!-- Perfil -->
         <div>
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
-            Perfil
-          </label>
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-200"
+            >Perfil</label
+          >
           <select
             v-model="editPerfil"
             class="w-full mt-1 rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           >
-            <option value="Administrador">Administrador</option>
-            <option value="Admin">Admin</option>
-            <option value="Funcionario">Funcionario</option>
-            <option value="funcionario">funcionario</option>
-            <option value="Gerente">Gerente</option>
+            <option value="administrador">Administrador</option>
+            <option value="funcionario">Funcionário</option>
+            <option value="gerente">Gerente</option>
           </select>
         </div>
 
         <!-- Panificadora -->
         <div>
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
-            ID Panificadora
-          </label>
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-200"
+            >ID Panificadora</label
+          >
           <input
             v-model.number="editPanificadora"
             type="number"
@@ -182,7 +164,7 @@ async function deletarUsuario() {
           <button
             class="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-medium transition-colors"
             :disabled="carregando"
-            @click="deletarUsuario"
+            @click.stop="deletarUsuario"
           >
             {{ carregando ? "..." : "Excluir" }}
           </button>
@@ -191,14 +173,14 @@ async function deletarUsuario() {
             <button
               class="px-4 py-2 rounded-lg bg-gray-400 hover:bg-gray-500 text-white font-medium transition-colors"
               :disabled="carregando"
-              @click="modalAberto = false"
+              @click.stop="modalAberto = false"
             >
               Cancelar
             </button>
             <button
               class="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium transition-colors"
               :disabled="carregando"
-              @click="salvarAlteracoes"
+              @click.stop="salvarAlteracoes"
             >
               {{ carregando ? "Salvando..." : "Salvar" }}
             </button>

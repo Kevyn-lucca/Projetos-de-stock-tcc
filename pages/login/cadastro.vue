@@ -5,9 +5,7 @@
     <div
       class="p-8 shadow text-center lg:w-[30rem] backdrop-blur-md rounded-xl bg-[rgba(255,255,255,0.06)]"
     >
-      <div class="text-3xl font-medium mb-6 text-primary-contrast">
-        Bem vindo
-      </div>
+      <div class="text-3xl font-medium mb-6 text-primary-contrast">Login</div>
 
       <form @submit.prevent="onSubmit" novalidate class="space-y-4">
         <input
@@ -18,29 +16,9 @@
           required
         />
         <input
-          v-model="form.nome"
-          type="text"
-          placeholder="Nome"
-          :class="inputClass"
-        />
-        <input
           v-model="form.senha"
           type="password"
           placeholder="Senha"
-          :class="inputClass"
-          required
-        />
-        <input
-          v-model="form.confirmSenha"
-          type="password"
-          placeholder="Confirme sua senha"
-          :class="inputClass"
-          required
-        />
-        <input
-          v-model="form.inviteToken"
-          type="text"
-          placeholder="Token de convite"
           :class="inputClass"
           required
         />
@@ -50,94 +28,55 @@
           :disabled="submitting"
           class="max-w-40 w-full rounded-full border-0 p-4 text-xl font-medium bg-white/30 hover:bg-white/40 text-primary-contrast/80 disabled:opacity-50 transition"
         >
-          <span v-if="!submitting">Cadastrar-se</span>
-          <span v-else>Enviando...</span>
+          <span v-if="!submitting">Entrar</span>
+          <span v-else>Entrando...</span>
         </button>
 
         <p v-if="errorMessage" class="text-red-400 text-sm mt-2">
           {{ errorMessage }}
-        </p>
-        <p v-if="successMessage" class="text-green-400 text-sm mt-2">
-          {{ successMessage }}
         </p>
       </form>
     </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
+import { useAuth } from "@/composables/useAuth";
+
 definePageMeta({ layout: false });
 
-const form = ref({
-  email: "",
-  nome: "",
-  senha: "",
-  confirmSenha: "",
-  inviteToken: "",
-});
-
+const form = ref({ email: "", senha: "" });
 const submitting = ref(false);
 const errorMessage = ref("");
-const successMessage = ref("");
 
 const inputClass =
   "!appearance-none placeholder:!text-primary-contrast/40 !border-0 !p-4 !w-full !outline-0 !text-base !block !bg-white/10 active:bg-white/20 !text-primary-contrast/70 !rounded-full";
 
-const { $api } = useNuxtApp();
+const { login } = useAuth();
 
 async function onSubmit() {
   errorMessage.value = "";
-  successMessage.value = "";
 
-  if (
-    !form.value.email.trim() ||
-    !form.value.senha.trim() ||
-    !form.value.inviteToken.trim()
-  ) {
-    errorMessage.value = "Preencha todos os campos obrigatórios.";
-    return;
-  }
-
-  if (form.value.senha !== form.value.confirmSenha) {
-    errorMessage.value = "As senhas não coincidem.";
+  if (!form.value.email.trim() || !form.value.senha.trim()) {
+    errorMessage.value = "Preencha todos os campos.";
     return;
   }
 
   submitting.value = true;
-
   try {
-    const payload = {
-      email: form.value.email.trim().toLowerCase(),
-      nome: form.value.nome.trim() || null,
-      senha: form.value.senha,
-      inviteToken: form.value.inviteToken, // envia token para backend
-    };
-
-    console.log(payload);
-
-    const res = await $api.post("/api/auth/registrar", payload, {
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (res.data?.success) {
-      successMessage.value =
-        res.data.message || "Usuário cadastrado com sucesso!";
-      form.value.senha = "";
-      form.value.confirmSenha = "";
-      form.value.inviteToken = "";
-      setTimeout(() => navigateTo("/login"), 1200);
+    const sucesso = await login(
+      form.value.email.trim(),
+      form.value.senha.trim()
+    );
+    if (sucesso) {
+      navigateTo("/controle_inventario");
     } else {
-      errorMessage.value = res.data?.message || "Erro ao cadastrar.";
+      errorMessage.value = "Usuário ou senha incorretos.";
     }
-  } catch (err) {
-    if (err.response?.data?.message) {
-      errorMessage.value = err.response.data.message;
-    } else if (err.message?.includes("Network")) {
-      errorMessage.value = "Falha de conexão com o servidor.";
-    } else {
-      errorMessage.value = "Erro inesperado ao tentar registrar.";
-    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
+    errorMessage.value = err.message || "Erro ao tentar login.";
   } finally {
     submitting.value = false;
   }

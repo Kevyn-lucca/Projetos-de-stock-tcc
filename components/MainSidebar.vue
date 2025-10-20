@@ -25,7 +25,7 @@
         <ul class="flex flex-col text-xl gap-10 mt-15 place-content-around">
           <li>
             <NuxtLink class="text-white" to="/gerenciamento_filial"
-              >gerenciamento de filiais</NuxtLink
+              >Gerenciamento de filiais</NuxtLink
             >
           </li>
           <li>

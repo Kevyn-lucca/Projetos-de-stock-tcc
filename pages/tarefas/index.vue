@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="flex flex-col items-center justify-center min-h-screen gap-6 bg-gray-100 dark:bg-zinc-900"
-  >
+  <div class="flex flex-col items-center justify-center min-h-screen gap-6">
     <h1 class="text-3xl font-bold text-gray-800 dark:text-white mt-6 mb-4">
       Quadro de Tarefas
     </h1>

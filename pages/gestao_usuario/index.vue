@@ -7,7 +7,7 @@ import MainUsuario from "@/components/MainUsuario.vue";
 const color = useColorMode();
 const { user } = useAuth();
 
-const isAdmin = true;
+const isAdmin = user.value?.perfil !== "funcionario";
 const isOpen = ref(false);
 const modalTitle = ref("");
 
@@ -67,7 +67,7 @@ const usuarios = ref<
     nome: string;
     email: string;
     perfil: string;
-    id_panificadora: number;
+    idPanificadora: number;
   }>
 >([]);
 const carregando = ref(false);
@@ -75,9 +75,9 @@ const carregando = ref(false);
 onMounted(async () => {
   try {
     carregando.value = true;
-    const res = await axios.get("https://localhost:8443/usuarios", {
-      headers: { Authorization: `Bearer ${user.value?.token}` },
-    });
+    const res = await axios.get(
+      "http://localhost:8080/WebAproject2/GerenciarUsuario?acao=listar"
+    );
     usuarios.value = res.data;
   } catch (err) {
     console.error("Erro ao buscar usuários:", err);
@@ -129,7 +129,7 @@ onMounted(async () => {
               :nome="usuario.nome"
               :email="usuario.email"
               :perfil="usuario.perfil"
-              :id_panificadora="usuario.id_panificadora"
+              :id_panificadora="usuario.idPanificadora"
             />
           </div>
         </div>

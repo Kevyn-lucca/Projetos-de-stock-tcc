@@ -201,7 +201,6 @@ const fetchEstoque = async () => {
       "http://localhost:8080/WebAproject2/gerenciarEstoque?acao=listar"
     );
 
-    // Ajuste do mapeamento conforme o JSON
     data.value = res.data.map((item: ProdutoAPI) => ({
       id: String(item.idEstoque),
       nome: item.produto?.nome || "Desconhecido",

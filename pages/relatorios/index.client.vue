@@ -31,7 +31,6 @@ async function carregarRelatorios() {
     relatorios.value = data;
   } catch (err) {
     console.error("Erro ao carregar relatórios:", err);
-    alert("Erro ao carregar relatórios.");
   } finally {
     carregando.value = false;
   }
@@ -61,7 +60,6 @@ async function adicionarRelatorio(tipo: "perda" | "venda") {
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
     );
 
-    alert("Relatório adicionado com sucesso!");
     await carregarRelatorios();
     novoRelatorio.value = {
       idPanificadora: 1,
@@ -72,13 +70,10 @@ async function adicionarRelatorio(tipo: "perda" | "venda") {
     };
   } catch (err) {
     console.error("Erro ao adicionar relatório:", err);
-    alert("Falha ao adicionar relatório.");
   }
 }
 
 async function deletarRelatorio(id: number) {
-  if (!confirm("Deseja realmente excluir este relatório?")) return;
-
   try {
     await axios.delete(
       `http://localhost:8080/WebAproject2/gerenciarRelatorio?idRelatorio=${id}`
@@ -86,7 +81,6 @@ async function deletarRelatorio(id: number) {
     relatorios.value = relatorios.value.filter((r) => r.idRelatorio !== id);
   } catch (err) {
     console.error("Erro ao deletar relatório:", err);
-    alert("Falha ao deletar relatório.");
   }
 }
 
@@ -144,13 +138,11 @@ onMounted(carregarRelatorios);
       <section
         class="bg-[#f4e1c1] p-6 rounded-2xl shadow-md mb-10 border border-[#064e3b]"
       >
-        <h2 class="text-2xl font-semibold mb-4 text-[#2c3930]">
-          Novo Relatório
-        </h2>
+        <h2 class="text-2xl font-semibold mb-4 text-black">Novo Relatório</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div>
-            <label class="font-medium text-sm text-[#2c3930]">Produto ID</label>
+            <label class="font-medium text-sm text-black">Produto ID</label>
             <input
               v-model.number="novoRelatorio.idProduto"
               type="number"
@@ -160,7 +152,9 @@ onMounted(carregarRelatorios);
           </div>
 
           <div>
-            <label class="font-medium text-sm text-[#2c3930]">Percentual</label>
+            <label class="font-medium text-sm text-black text-[#2c3930]"
+              >Percentual</label
+            >
             <input
               v-model.number="novoRelatorio.percentual"
               type="number"
@@ -171,7 +165,9 @@ onMounted(carregarRelatorios);
           </div>
 
           <div>
-            <label class="font-medium text-sm text-[#2c3930]">Data</label>
+            <label class="font-medium text-sm text-black text-[#2c3930]"
+              >Data</label
+            >
             <input
               v-model="novoRelatorio.periodo"
               type="date"
@@ -181,7 +177,9 @@ onMounted(carregarRelatorios);
         </div>
 
         <div>
-          <label class="font-medium text-sm text-[#2c3930]">Causa</label>
+          <label class="font-medium text-sm text-black text-[#2c3930]"
+            >Causa</label
+          >
           <input
             v-model="novoRelatorio.causa"
             type="text"

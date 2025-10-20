@@ -25,7 +25,6 @@ function atualizarFilial() {
   emit("filialAlterada");
 }
 
-// --- Atualizar filial ---
 async function salvarAlteracoes() {
   try {
     carregando.value = true;
@@ -36,7 +35,7 @@ async function salvarAlteracoes() {
       cnpj: editCnpj.value,
       endereco: editEndereco.value,
       telefone: editTelefone.value,
-      desativado: !props.ativo, // compatível com o backend
+      desativado: !props.ativo,
     };
 
     await axios.put(
@@ -44,25 +43,22 @@ async function salvarAlteracoes() {
       payload
     );
 
-    alert("Filial atualizada com sucesso!");
     modalAberto.value = false;
     atualizarFilial();
   } catch (err) {
     console.error("Erro ao atualizar filial:", err);
-    alert("Erro ao atualizar filial");
   } finally {
     carregando.value = false;
   }
 }
 
-// --- Desativar / Reativar filial ---
 async function toggleStatusFilial() {
   try {
     carregando.value = true;
 
     const payload = {
       idPanificadora: props.id,
-      desativado: props.ativo, // ativo=true → desativar
+      desativado: props.ativo,
     };
 
     await axios.put(
@@ -70,12 +66,10 @@ async function toggleStatusFilial() {
       payload
     );
 
-    alert(`Filial ${props.ativo ? "desativada" : "reativada"} com sucesso!`);
     modalAberto.value = false;
     atualizarFilial();
   } catch (err) {
     console.error("Erro ao alterar status da filial:", err);
-    alert("Erro ao alterar status da filial");
   } finally {
     carregando.value = false;
   }
@@ -93,7 +87,6 @@ async function toggleStatusFilial() {
     "
     @click="modalAberto = true"
   >
-    <!-- Indicador de status -->
     <div
       class="absolute top-2 right-2 px-2 py-1 text-xs font-semibold rounded-full"
       :class="
@@ -103,7 +96,6 @@ async function toggleStatusFilial() {
       {{ props.ativo ? "Ativa" : "Inativa" }}
     </div>
 
-    <!-- Imagem -->
     <div
       class="h-44 w-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-400 text-sm"
     >
