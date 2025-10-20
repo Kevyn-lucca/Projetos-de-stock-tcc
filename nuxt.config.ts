@@ -41,7 +41,7 @@ export default defineNuxtConfig({
       contentSecurityPolicy: {
         "default-src": ["'self'"],
         "img-src": ["'self'", "data:", "https://api.dicebear.com"],
-        "connect-src": ["'self'", "https://localhost:8080"],
+        "connect-src": ["'self'", "https://localhost:8443"],
       },
     },
   },
