@@ -36,14 +36,14 @@ export default defineNuxtConfig({
     "nuxt-security",
   ],
 
+export default defineNuxtConfig({
   security: {
     headers: {
       contentSecurityPolicy: {
         "default-src": ["'self'"],
         "img-src": ["'self'", "data:", "https://api.dicebear.com"],
         "connect-src": ["'self'", "http://localhost:8080", "https://localhost:8080"],
-
       },
     },
   },
-});
+})
