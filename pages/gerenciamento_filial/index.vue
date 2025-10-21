@@ -54,16 +54,14 @@ async function carregarFiliais() {
 async function adicionarFilial() {
   carregando.value = true;
   try {
-    await axios.post(
-      "http://localhost:8080/WebAproject2/GerenciarPanificadora/adicionar",
-      {
-        nome: novaFilialNome.value,
-        cnpj: novaFilialCnpj.value,
-        endereco: novaFilialEndereco.value,
-        telefone: novaFilialTelefone.value,
-        desativado: false,
-      }
-    );
+await axios.post("http://localhost:8080/WebAproject2/GerenciarPanificadora", {
+  nome: novaFilialNome.value,
+  cnpj: novaFilialCnpj.value,
+  endereco: novaFilialEndereco.value,
+  telefone: novaFilialTelefone.value,
+  desativado: false,
+});
+
 
     novaFilialNome.value = "";
     novaFilialCnpj.value = "";
