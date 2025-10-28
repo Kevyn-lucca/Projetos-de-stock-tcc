@@ -51,7 +51,6 @@ async function salvarAlteracoes() {
       return;
     }
 
-    alert("Usuário atualizado com sucesso!");
     modalAberto.value = false;
     atualizarUsuarios();
   } catch (err: any) {
@@ -80,7 +79,6 @@ async function deletarUsuario() {
     if (data?.erro) {
       alert(data.erro);
     } else {
-      alert("Usuário excluído com sucesso.");
       modalAberto.value = false;
       atualizarUsuarios();
     }
