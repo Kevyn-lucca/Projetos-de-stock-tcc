@@ -51,6 +51,7 @@ async function salvarAlteracoes() {
       return;
     }
 
+    alert("Usuário atualizado com sucesso!");
     modalAberto.value = false;
     atualizarUsuarios();
   } catch (err: any) {
@@ -61,10 +62,28 @@ async function salvarAlteracoes() {
   }
 }
 
-// ---------- EXCLUIR USUÁRIO ----------
-async function deletarUsuario() {
-  if (!confirm(`Tem certeza que deseja excluir ${props.nome}?`)) return;
+async function AtivarUsuario() {
+  try {
+    carregando.value = true;
 
+    await axios.put(
+      `http://localhost:8080/WebAproject2/GerenciarUsuario?acao=ativar&idUsuario=${props.idUsuario}`,
+      {
+        params: { idUsuario: props.idUsuario },
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    modalAberto.value = false;
+    atualizarUsuarios();
+  } catch (err: any) {
+    console.error("Erro ao deletar usuário:", err);
+  } finally {
+    carregando.value = false;
+  }
+}
+
+async function deletarUsuario() {
   try {
     carregando.value = true;
 
@@ -79,6 +98,7 @@ async function deletarUsuario() {
     if (data?.erro) {
       alert(data.erro);
     } else {
+      alert("Usuário excluído com sucesso.");
       modalAberto.value = false;
       atualizarUsuarios();
     }
@@ -128,7 +148,9 @@ async function deletarUsuario() {
       <div class="flex flex-col gap-4 p-4">
         <!-- Nome -->
         <div>
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-200">Nome</label>
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-200"
+            >Nome</label
+          >
           <input
             v-model="editNome"
             type="text"
@@ -138,7 +160,9 @@ async function deletarUsuario() {
 
         <!-- Email -->
         <div>
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-200">E-mail</label>
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-200"
+            >E-mail</label
+          >
           <input
             v-model="editEmail"
             type="email"
@@ -148,7 +172,9 @@ async function deletarUsuario() {
 
         <!-- Perfil -->
         <div>
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-200">Perfil</label>
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-200"
+            >Perfil</label
+          >
           <select
             v-model="editPerfil"
             class="w-full mt-1 rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -161,7 +187,9 @@ async function deletarUsuario() {
 
         <!-- Panificadora -->
         <div>
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-200">ID Panificadora</label>
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-200"
+            >ID Panificadora</label
+          >
           <input
             v-model.number="editPanificadora"
             type="number"
@@ -187,6 +215,14 @@ async function deletarUsuario() {
               @click.stop="modalAberto = false"
             >
               Cancelar
+            </button>
+
+            <button
+              class="px-4 py-2 rounded-lg bg-gray-400 hover:bg-gray-500 text-white font-medium transition-colors"
+              :disabled="carregando"
+              @click.stop="AtivarUsuario"
+            >
+              Ativar
             </button>
 
             <button
