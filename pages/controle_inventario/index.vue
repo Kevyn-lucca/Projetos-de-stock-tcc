@@ -39,7 +39,7 @@
           <div class="px-4 dark:text-white py-3 flex flex-col gap-4">
             <div class="flex flex-col">
               <label class="text-sm font-medium">Produto:</label>
-              <select v-model="novoItem.idProduto" class="input-base">
+              <select v-model="novoItem.idProduto" class="input-base text-black placeholder-gray-600 dark:bg-black dark:text-white dark:placeholder-gray-600">
                 <option
                   v-for="produto in Produtos"
                   :key="produto.id"
@@ -159,6 +159,7 @@ type ProdutoAPI = {
     categoria: string;
     unidadeMedida: string;
     perecivel: boolean;
+    url: string;
   };
   idPanificadora: number;
   quantidade: number;
@@ -210,10 +211,7 @@ const fetchEstoque = async () => {
         item.status?.toUpperCase() === "ATIVO"
           ? "ok"
           : item.status?.toLowerCase() || "indefinido",
-      img:
-        "/produtos/" +
-        (item.produto?.nome?.toLowerCase().replace(/\s+/g, "-") || "default") +
-        ".png",
+      img: item.produto?.url,
       quantidade: item.quantidade,
       IdProduto: item.produto?.idProduto,
     }));
