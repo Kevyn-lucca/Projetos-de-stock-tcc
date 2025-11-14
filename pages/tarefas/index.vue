@@ -5,7 +5,7 @@
     </h1>
 
     <!-- Botão de adicionar tarefa -->
-    <button
+    <button v-if="isAdmin"
       class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
       @click="abrirModal"
     >
@@ -88,6 +88,7 @@
           draggable="true"
           class="hover:cursor-grab active:cursor-grabbing"
           @dragstart="onDragStart(t)"
+            @tarefaExcluida="removerTarefa"
         />
       </TarefaPrincipal>
 
@@ -106,6 +107,7 @@
           draggable="true"
           class="hover:cursor-grab active:cursor-grabbing"
           @dragstart="onDragStart(t)"
+            @tarefaExcluida="removerTarefa"
         />
       </TarefaPrincipal>
 
@@ -128,6 +130,7 @@
           draggable="true"
           class="hover:cursor-grab active:cursor-grabbing"
           @dragstart="onDragStart(t)"
+            @tarefaExcluida="removerTarefa"
         />
       </TarefaPrincipal>
     </div>
@@ -143,6 +146,9 @@ import TarefaPrincipal from "@/components/TarefaPrincipal.vue";
 import tarefaBlock from "@/components/tarefaBlock.vue";
 
 const { user } = useAuth();
+
+const isAdmin = user.value?.perfil !== "funcionario";
+
 const { tarefas, moverTarefa, carregarTarefas, adicionarTarefa } = useTarefas();
 
 const dragItem = ref(null);
@@ -186,7 +192,6 @@ function mover({ status, color }) {
   moverTarefa({ status, color }, dragItem);
 }
 
-// --- Buscar todos os usuários da tabela ---
 async function carregarUsuarios() {
   try {
     const res = await axios.get(
@@ -202,4 +207,11 @@ onMounted(() => {
   carregarUsuarios();
   carregarTarefas();
 });
+
+function removerTarefa(idTarefa) {
+  const index = tarefas.value.findIndex(t => t.idTarefa === idTarefa);
+  if (index !== -1) {
+    tarefas.value.splice(index, 1);
+  }
+}
 </script>

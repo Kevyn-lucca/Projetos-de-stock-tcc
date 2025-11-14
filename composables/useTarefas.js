@@ -23,8 +23,7 @@ export function useTarefas() {
     erro.value = null;
 
     try {
-      const idUsuario = user.value?.id ?? null;
-
+      const idUsuario = user.value?.idUsuario;
       const res = await axios.get(API_URL, {
         params: {
           acao: "listar",
@@ -50,16 +49,19 @@ export function useTarefas() {
     }
   }
 
+
+  
   async function adicionarTarefa(nova) {
     try {
       carregando.value = true;
 
+      console.log(nova)
       const payload = {
         titulo: nova.titulo,
         mensagem: nova.mensagem,
         status: nova.status || "fazer",
         color: nova.color || "secondary",
-        idUsuario: user.value?.id ?? null,
+        idUsuario: nova.idUsuario,
       };
 
       const res = await axios.post(API_URL, payload);
@@ -96,22 +98,6 @@ export function useTarefas() {
     }
   }
 
-  async function deletarTarefa(idTarefa) {
-    try {
-      carregando.value = true;
-
-      await axios.delete(API_URL, {
-        params: { idTarefa },
-      });
-
-      tarefas.value = tarefas.value.filter((t) => t.idTarefa !== idTarefa);
-    } catch (err) {
-      console.error("❌ Erro ao deletar tarefa:", err);
-    } finally {
-      carregando.value = false;
-    }
-  }
-
   function moverTarefa({ status, color }, dragItem) {
     if (dragItem.value) {
       dragItem.value.status = status;
@@ -121,9 +107,7 @@ export function useTarefas() {
     }
   }
 
-  onMounted(() => {
-    carregarTarefas();
-  });
+
 
   return {
     tarefas,
@@ -132,7 +116,6 @@ export function useTarefas() {
     carregarTarefas,
     adicionarTarefa,
     atualizarTarefa,
-    deletarTarefa,
     moverTarefa,
   };
 }

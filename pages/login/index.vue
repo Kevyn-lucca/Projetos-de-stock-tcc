@@ -55,15 +55,18 @@ const errorMessage = ref("");
 
 const router = useRouter();
 const { login } = useAuth();
-
 const handleLogin = async () => {
   errorMessage.value = "";
-  const success = await login(email.value, senha.value);
-  if (success) {
-    console.log("entrei");
-    router.push("/controle_inventario");
-  } else {
-    errorMessage.value = "Email ou senha inválidos";
+  try {
+    const success = await login(email.value, senha.value);
+    if (success) {
+      router.push("/controle_inventario");
+    } else {
+      errorMessage.value = "Email ou senha inválidos";
+    }
+  } catch (err: any) {
+    errorMessage.value = err.message || "Erro inesperado no login.";
   }
 };
+
 </script>

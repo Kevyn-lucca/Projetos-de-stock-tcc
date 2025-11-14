@@ -114,7 +114,6 @@ async function onSubmit() {
       senha: form.value.senha,
     };
 
-    console.log("Enviando:", payload);
 
     const res = await fetch(
       "http://localhost:8080/WebAproject2/GerenciarUsuario?acao=criar",

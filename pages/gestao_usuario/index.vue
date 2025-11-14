@@ -77,9 +77,7 @@ const groups = [
   },
 ];
 
-// -----------------------------
-// Carregar usuários
-// -----------------------------
+
 async function carregarUsuarios() {
   try {
     carregando.value = true;
@@ -94,9 +92,7 @@ async function carregarUsuarios() {
   }
 }
 
-// -----------------------------
-// Gerar token manualmente
-// -----------------------------
+
 async function gerarToken() {
   try {
     gerandoToken.value = true;
