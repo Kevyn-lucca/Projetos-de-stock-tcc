@@ -22,10 +22,6 @@
     <!-- Rodapé -->
   <div class="itemTarefa mt-3 flex items-center justify-between p-2 rounded-lg border border-gray-200">
   <div class="flex items-center space-x-3">
-    <UAvatar
-      :src="tarefa.avatar || 'https://api.dicebear.com/7.x/initials/svg?seed=' + (tarefa.nomeUsuario || 'User')"
-      size="md"
-    />
     <span class="text-xs text-gray-500">{{ tarefa.dataCriacao }}</span>
   </div>
 
@@ -60,7 +56,7 @@ const props = defineProps({
     }),
   },
 });
-
+console.log(props.tarefa)
 
 //imagem do usuario tá bugando
 const emit = defineEmits(["tarefaExcluida"]);

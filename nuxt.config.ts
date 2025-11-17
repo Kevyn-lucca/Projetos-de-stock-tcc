@@ -4,8 +4,9 @@ export default defineNuxtConfig({
 
   devtools: { enabled: true },
 
-  css: ["~/assets/auxiliar.css"],
 
+  
+  css: ["~/assets/auxiliar.css"],
   vite: {
     css: {
       preprocessorOptions: {
@@ -15,8 +16,8 @@ export default defineNuxtConfig({
       },
     },
   },
-
   app: {
+    
     head: {
       link: [
         {
@@ -26,6 +27,7 @@ export default defineNuxtConfig({
         },
       ],
     },
+    
   },
 
   modules: [
@@ -41,7 +43,7 @@ export default defineNuxtConfig({
       contentSecurityPolicy: {
         "default-src": ["'self'"],
         "img-src": ["'self'", "data:", "https://api.dicebear.com",        
-          "https://cdn.imgchest.com"
+          "https://res.cloudinary.com"
 ],
         "connect-src": [
           "'self'",

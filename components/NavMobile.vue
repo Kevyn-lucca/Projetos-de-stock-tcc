@@ -1,10 +1,25 @@
 <!-- eslint-disable vue/no-deprecated-v-on-native-modifier -->
 
 <script setup lang="ts">
-import { ref, watch, nextTick, onMounted, onUnmounted } from "vue";
+import { ref, watch, nextTick } from "vue";
 import { useColorMode } from "#imports";
+import { useAuth } from "~/composables/useAuth";
 
-// Controle de abertura do menu
+const { user } = useAuth(); // estado reativo do usuário
+
+function gerarAvatares(nome: string) {
+  const seed = encodeURIComponent(nome);
+  return `https://api.dicebear.com/8.x/lorelei/svg?seed=${seed}`;
+}
+
+onMounted(() => {
+  if (user.value?.nome) {
+    url.value = gerarAvatares(user.value.nome);
+  }
+});
+
+
+const url = ref("");
 const open = ref(false);
 const panel = ref<HTMLDivElement | null>(null);
 
@@ -15,13 +30,7 @@ function closeMenu() {
   open.value = false;
 }
 
-// Fecha ao pressionar ESC
-function onKeydown(e: KeyboardEvent) {
-  if (e.key === "Escape" && open.value) closeMenu();
-}
 
-onMounted(() => window.addEventListener("keydown", onKeydown));
-onUnmounted(() => window.removeEventListener("keydown", onKeydown));
 
 watch(open, async (val) => {
   if (val) {
@@ -59,13 +68,16 @@ watch(open, async (val) => {
     tabindex="-1"
   >
     <div class="flex justify-between items-center mb-6">
-      <div class="flex items-center gap-3">
-        <div>
-          <h2 class="text-2xl font-bold text-white">Nome de usuario</h2>
-          <NuxtLink to="/gestao_usuario" class="block -mt-1">
-            <UAvatar src="https://github.com/benjamincanac.png" size="lg" />
-          </NuxtLink>
-        </div>
+      <div class="flex items-center justify-between w-full mb-4">
+        <h2
+          class="flex-1 text-2xl sm:text-3xl md:text-4xl font-bold text-white truncate"
+          :title="user?.nome"
+        >
+          {{ user?.nome }}
+        </h2>
+        <NuxtLink to="/gestao_usuario">
+          <UAvatar :src="url" size="xl" />
+        </NuxtLink>
       </div>
       <UButton variant="subtle" class="p-1" @click="closeMenu">
         <Icon class="h-5 w-5" name="lucide:x" style="color: white" />

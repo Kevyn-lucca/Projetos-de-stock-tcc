@@ -1,122 +1,210 @@
 <template>
-  <div
-    class="flex flex-col md:flex-row items-start md:items-center justify-start md:justify-center min-h-screen gap-4 p-4"
-  >
-    <TarefaPrincipal
-      status="fazer"
-      color="secondary"
-      class="w-full md:w-auto"
-      @drop-tarefa="moverTarefa"
+  <div class="flex flex-col items-center justify-center min-h-screen gap-4 p-4 sm:p-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white mt-4 mb-2 text-center">
+      Quadro de Tarefas
+    </h1>
+    <button v-if="isAdmin"
+      class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition shadow-md"
+      @click="abrirModal"
     >
-      <div class="flex items-center gap-2">
-        <Icon
-          class="h-5 w-5"
-          name="lucide:clipboard-list"
-          style="color: lightskyblue"
-        />
-        <h1 class="text-xl text-center">A Fazer</h1>
-      </div>
-      <tarefaBlock
-        v-for="t in tarefas.filter((x) => x.status === 'fazer')"
-        :key="t.id"
-        :tarefa="t"
-        draggable="true"
-        class="hover:cursor-grab dragging:cursor-grabbing"
-        @dragstart="onDragStart(t)"
-      />
-    </TarefaPrincipal>
+      + Nova Tarefa
+    </button>
 
-    <TarefaPrincipal
-      status="fazendo"
-      color="warning"
-      class="w-full md:w-auto border-t border-[#006d77]"
-      @drop-tarefa="moverTarefa"
-    >
-      <div class="flex gap-2 items-center">
-        <Icon class="h-5 w-5" name="lucide:loader" style="color: yellow" />
-        <h1 class="text-xl text-center">Em Progresso</h1>
-      </div>
-      <tarefaBlock
-        v-for="t in tarefas.filter((x) => x.status === 'fazendo')"
-        :key="t.id"
-        :tarefa="t"
-        draggable="true"
-        class="hover:cursor-grab [&.is-dragging]:cursor-grabbing"
-        @dragstart="onDragStart(t)"
-      />
-    </TarefaPrincipal>
+    <UModal v-model:open="modalAberto" title="Adicionar nova tarefa">
+      <template #body>
+        <div class="p-4 flex flex-col gap-4">
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
+            Título
+          </label>
+          <input
+            v-model="novaTarefa.titulo"
+            type="text"
+            placeholder="Título da tarefa"
+            class="input-base p-2 border rounded-md"
+          />
 
-    <TarefaPrincipal
-      status="feito"
-      color="primary"
-      class="w-full md:w-auto border-t border-[#006d77]"
-      @drop-tarefa="moverTarefa"
-    >
-      <div class="flex items-center gap-2 ml-2">
-        <Icon
-          class="h-5 w-5"
-          name="lucide:square-check-big"
-          style="color: lightgreen"
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
+            Mensagem
+          </label>
+          <textarea
+            v-model="novaTarefa.mensagem"
+            placeholder="Descrição da tarefa"
+            rows="4"
+            class="input-base p-2 border rounded-md resize-none"
+          ></textarea>
+
+          <div v-if="user.value?.perfil !== 'funcionario'">
+            <select v-model="novaTarefa.idUsuario" class="input-base w-full p-2 border rounded-md">
+              <option disabled value="">Selecione o usuário</option>
+              <option
+                v-for="u in usuarios"
+                :key="u.idUsuario"
+                :value="u.idUsuario"
+              >
+                {{ u.nome }} - {{ u.perfil }}
+              </option>
+            </select>
+          </div>
+
+          <div class="flex justify-end gap-3 mt-4">
+            <button
+              class="px-4 py-2 rounded-lg bg-gray-400 hover:bg-gray-500 text-white font-medium transition-colors"
+              @click="fecharModal"
+            >
+              Cancelar
+            </button>
+            <button
+              class="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium transition-colors"
+              @click="criarTarefa"
+            >
+              Salvar
+            </button>
+          </div>
+        </div>
+      </template>
+    </UModal>
+    <div class="flex flex-col sm:flex-row flex-wrap justify-center gap-4 sm:gap-6 w-full max-w-6xl">
+      <TarefaPrincipal status="fazer" color="secondary" @drop-tarefa="mover" class="w-full sm:w-[300px]">
+        <div class="flex items-center gap-2 mb-3">
+          <Icon
+            class="h-5 w-5"
+            name="lucide:clipboard-list"
+            style="color: lightskyblue"
+          />
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+            Fazer
+          </h2>
+        </div>
+        <tarefaBlock
+          v-for="t in tarefas.filter((x) => x.status === 'fazer')"
+          :key="t.idTarefa"
+          :tarefa="t"
+          draggable="true"
+          class="hover:cursor-grab active:cursor-grabbing mb-2"
+          @dragstart="onDragStart(t)"
+          @tarefaExcluida="removerTarefa"
         />
-        <h1 class="text-xl text-center">Concluído</h1>
-      </div>
-      <tarefaBlock
-        v-for="t in tarefas.filter((x) => x.status === 'feito')"
-        :key="t.id"
-        :tarefa="t"
-        draggable="true"
-        class="hover:cursor-grab [&.is-dragging]:cursor-grabbing"
-        @dragstart="onDragStart(t)"
-      />
-    </TarefaPrincipal>
+      </TarefaPrincipal>
+
+      <TarefaPrincipal status="fazendo" color="warning" @drop-tarefa="mover" class="w-full sm:w-[300px]">
+        <div class="flex items-center gap-2 mb-3">
+          <Icon class="h-5 w-5" name="lucide:loader" style="color: gold" />
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+            Fazendo
+          </h2>
+        </div>
+        <tarefaBlock
+          v-for="t in tarefas.filter((x) => x.status === 'fazendo')"
+          :key="t.idTarefa"
+          :tarefa="t"
+          draggable="true"
+          class="hover:cursor-grab active:cursor-grabbing mb-2"
+          @dragstart="onDragStart(t)"
+          @tarefaExcluida="removerTarefa"
+        />
+      </TarefaPrincipal>
+
+      <TarefaPrincipal status="feito" color="primary" @drop-tarefa="mover" class="w-full sm:w-[300px]">
+        <div class="flex items-center gap-2 mb-3">
+          <Icon
+            class="h-5 w-5"
+            name="lucide:square-check-big"
+            style="color: lightgreen"
+          />
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+            Feito
+          </h2>
+        </div>
+        <tarefaBlock
+          v-for="t in tarefas.filter((x) => x.status === 'feito')"
+          :key="t.idTarefa"
+          :tarefa="t"
+          draggable="true"
+          class="hover:cursor-grab active:cursor-grabbing mb-2"
+          @dragstart="onDragStart(t)"
+          @tarefaExcluida="removerTarefa"
+        />
+      </TarefaPrincipal>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
-
-const tarefas = ref([
-  {
-    id: 1,
-    titulo: "COMER UM PUDIM",
-    mensagem: "TESTE DE UMA MESSAGEM MANEIRA",
-    status: "fazer",
-    color: "secondary",
-  },
-  {
-    id: 2,
-    titulo: "Avaliar trabalho",
-    mensagem: "avaliar os trabalhos",
-    status: "fazendo",
-    color: "warning",
-  },
-  {
-    id: 3,
-    titulo: "Dar notas",
-    mensagem: "dar uma nota 10 ao meu grupo (kevyn)",
-    status: "feito",
-    color: "primary",
-  },
-]);
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import { useAuth } from "@/composables/useAuth";
+import { useTarefas } from "@/composables/useTarefas";
+import TarefaPrincipal from "@/components/TarefaPrincipal.vue";
+import tarefaBlock from "@/components/tarefaBlock.vue";
 definePageMeta({
-  layout: "mobile",
+    layout: "mobile",
 });
+const { user } = useAuth();
+
+const isAdmin = user.value?.perfil !== "funcionario";
+
+const { tarefas, moverTarefa, carregarTarefas, adicionarTarefa } = useTarefas();
+
 const dragItem = ref(null);
+const modalAberto = ref(false);
+const usuarios = ref([]);
+
+const novaTarefa = ref({
+  titulo: "",
+  mensagem: "",
+  idUsuario: "",
+});
+
+function abrirModal() {
+  modalAberto.value = true;
+}
+
+function fecharModal() {
+  modalAberto.value = false;
+  novaTarefa.value = { titulo: "", mensagem: "", idUsuario: "" };
+}
+
+async function criarTarefa() {
+  if (!novaTarefa.value.titulo || !novaTarefa.value.mensagem) {
+    alert("Preencha todos os campos!");
+    return;
+  }
+
+  if (user.value?.perfil === "funcionario") {
+    novaTarefa.value.idUsuario = user.value.id;
+  }
+
+  await adicionarTarefa(novaTarefa.value);
+  fecharModal();
+}
 
 function onDragStart(tarefa) {
   dragItem.value = tarefa;
 }
+function mover({ status, color }) {
+  moverTarefa({ status, color }, dragItem);
+}
 
-function moverTarefa({ status, color }) {
-  if (dragItem.value) {
-    dragItem.value.status = status;
-    dragItem.value.color = color;
+async function carregarUsuarios() {
+  try {
+    const res = await axios.get(
+      "http://localhost:8080/WebAproject2/GerenciarUsuario?acao=listar"
+    );
+    usuarios.value = res.data;
+  } catch (err) {
+    console.error("Erro ao buscar usuários:", err);
+  }
+}
+
+onMounted(() => {
+  carregarUsuarios();
+  carregarTarefas();
+});
+
+function removerTarefa(idTarefa) {
+  const index = tarefas.value.findIndex(t => t.idTarefa === idTarefa);
+  if (index !== -1) {
+    tarefas.value.splice(index, 1);
   }
 }
 </script>
-
-<style scoped>
-.w-full {
-  width: 100%;
-}
-</style>

@@ -67,7 +67,6 @@ export function useTarefas() {
       const res = await axios.post(API_URL, payload);
 
       const tarefa = res.data;
-      tarefa.avatar = gerarAvatar(tarefa.titulo);
       tarefas.value.push(tarefa);
     } catch (err) {
       console.log("erro ao adicionar tarefas" + err);
